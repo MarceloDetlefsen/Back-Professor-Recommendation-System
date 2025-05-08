@@ -1,9 +1,14 @@
 from neo4j import GraphDatabase
 URI = "bolt://localhost:7687"
 AUTH = ("neo4j", "9vK@U$]73i{$")
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
+
+try:
+    driver = GraphDatabase.driver(URI, auth=AUTH)
     driver.verify_connectivity()
-    print("Se ha conectado correctamente a tu base de datos.")
+    print("Conexión exitosa a la base de datos")
+except Exception as e:
+    print(f"Error de conexión: {e}")
+    exit()
 
 def registrar_estudiante(tx, nombre, estilo_aprendizaje, estilo_clase, promedio, asistencias, veces_curso):
     #Calculo de puntuaciones
@@ -35,10 +40,3 @@ def registrar_estudiante(tx, nombre, estilo_aprendizaje, estilo_clase, promedio,
                 veces_curso=veces_curso,
                 puntuacion_total=puntuacion_total)
     return result.single()
-
-with driver.session() as session:
-    result = session.execute_write(
-        registrar_estudiante,
-        "María González", "visual", "presencial", 88, 5, 0
-    )
-    print("Estudiante registrado:", result["e"]["nombre"])
