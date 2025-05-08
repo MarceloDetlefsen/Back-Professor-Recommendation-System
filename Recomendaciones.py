@@ -123,3 +123,34 @@ def puntuacion_profesor(tx, nombre_profesor):
     else:
         return 0
 
+def main():
+    print("=== Sistema de Recomendación UVG ===")
+    nombre = input("Nombre del estudiante: ")
+    estilo_aprendizaje = input("Estilo de aprendizaje (visual/práctico/teórico): ")
+    estilo_clase = input("Modalidad (presencial/virtual): ")
+    promedio = int(input("Promedio académico (0-100): "))
+    asistencias = int(input("Asistencias en curso anterior (0-5): "))
+    veces_curso = int(input("Veces que ha llevado el curso (0-5): "))
+
+    with driver.session() as session:
+        session.execute_write(registrar_estudiante, nombre, estilo_aprendizaje, estilo_clase, promedio, asistencias, veces_curso)
+        print("\n¡Registro exitoso! Calculando recomendaciones...\n")
+
+        recomendaciones = session.execute_write(recomendar_profesores, nombre)
+
+        if not recomendaciones:
+            print("No hay profesores que cumplan tus requisitos exactos.")
+        else:
+            print("\nTop profesores recomendados:")
+            for i, profe in enumerate(recomendaciones, 1):
+                print(f"""
+                {i}. {profe['profesor']}:
+                  - Índice de compatibilidad: {profe['indice_compatibilidad']:.2f}%
+                  - Puntuación estudiante: {profe['puntuacion_estudiante']}/20
+                  - Puntuación profesor: {profe['puntuacion_profesor']}/20
+                  - Afinidad con similares: {profe['afinidad']:.2f}%
+                """)
+
+if _name_ == "_main_":
+    main()
+    driver.close()
