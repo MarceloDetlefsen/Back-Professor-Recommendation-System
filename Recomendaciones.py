@@ -101,3 +101,25 @@ def recomendar_profesores(tx, nombre_estudiante):
         })
 
     return sorted(recomendaciones, key=lambda x: x["indice_compatibilidad"], reverse=True)
+
+def puntuacion_profesor(tx, nombre_profesor):
+    query = """
+    MATCH (p:Profesor {nombre: $nombre_profesor})
+    RETURN p.años_experiencia AS experiencia,
+           p.evaluacion_docente AS evaluacion,
+           p.porcentaje_aprobados AS aprobados,
+           p.disponibilidad AS disponibilidad
+    """
+    result = tx.run(query, nombre_profesor=nombre_profesor).single()
+    
+    if result:
+        experiencia = min(5, result["experiencia"] // 5)  # 1 punto por cada 5 años de experiencia
+        evaluacion = min(5, result["evaluacion_docente"])  # 1 punto por cada estrella en la evaluación docente
+        aprobados = min(5, (result["porcentaje_aprobados"]/100) * 5)  # 1 punto por cada 20% de aprobados
+        disponibilidad = min(5, result["disponibilidad"])  # 1 punto por cada nivel de disponibilidad
+        
+        puntuacion_total_profesor = experiencia + evaluacion + aprobados + disponibilidad
+        return puntuacion_total_profesor
+    else:
+        return 0
+
