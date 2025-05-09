@@ -151,6 +151,5 @@ def main():
                   - Afinidad con similares: {profe['afinidad']:.2f}%
                 """)
 
-if _name_ == "_main_":
-    main()
-    driver.close()
+main()
+driver.close()
