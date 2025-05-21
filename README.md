@@ -39,18 +39,24 @@ pip install -r requisitos.txt
 ```
 
 4. Configurar variables de entorno:
-   - Crear un archivo `.env` en la raíz del proyecto con la siguiente información:
+   - Editar el archivo `.env` en la raíz del proyecto con la siguiente información:
    ```
    NEO4J_URI=bolt://localhost:7687
    NEO4J_USER=neo4j
-   NEO4J_PASSWORD=tu_contraseña
+   NEO4J_PASSWORD=tu_contraseña //Modificar esto
    DEBUG=True
    ```
 
 ## Iniciar la aplicación
 
+1. Se ponen de momento asi datos en la base datos.
 ```bash
-python src/main.py
+poetry run python -m scripts.init_db
+```
+
+2. Se ejecuta el programa
+```bash
+poetry run python -m src.main
 ```
 
 La API estará disponible en `http://localhost:8000`
@@ -62,14 +68,20 @@ Luego de iniciar la aplicación, puedes acceder a la documentación interactiva:
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
+**Queda pendiente conectar el back con el front**
+
 ## Estructura del proyecto
 
 ```
-back-professor-recommendation-system/
+Back-Professor-Recommendation-System/
+├── scripts/
+|   ├── __init__.py
+|   ├── init_db.py
 ├── src/
 │   ├── api/
 │   │   ├── __init__.py
 │   │   ├── rutas.py
+│   │   ├── rutas_cursos.py
 │   │   ├── rutas_estudiantes.py
 │   │   └── rutas_profesores.py
 │   ├── database/
@@ -95,14 +107,14 @@ back-professor-recommendation-system/
 │   ├── __init__.py
 │   ├── algoritmo_recomendacion.py
 │   └── base_datos.py
+├── venv/
 ├── .env
-├── .gitignore
 ├── pyproject.toml
 ├── README.md
 └── requisitos.txt
 ```
 
-## Modelos de datos
+# Modelos de datos
 
 ### Estudiante
 - Nombre

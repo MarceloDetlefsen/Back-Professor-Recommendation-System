@@ -1,10 +1,10 @@
-from src.database.neo4jdriver import Neo4jDriver
+from database.neo4jdriver import Neo4jDriver
 from fastapi import APIRouter, HTTPException, Body
 from typing import List, Optional
 
-from src.models.estudiante import Estudiante
-from src.services.algoritmo_estudiante import AlgoritmoEstudiante
-from src.utils.helpers import create_response, validate_learning_style, validate_class_style
+from models.estudiante import Estudiante
+from services.algoritmo_estudiante import AlgoritmoEstudiante
+from utils.helpers import create_response, validate_learning_style, validate_class_style
 
 router = APIRouter()
 

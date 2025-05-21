@@ -1,6 +1,6 @@
-from src.database.neo4jdriver import Neo4jDriver
-from src.services.algoritmo_estudiante import AlgoritmoEstudiante
-from src.services.algoritmo_profesor import AlgoritmoProfesor
+from database.neo4jdriver import Neo4jDriver
+from services.algoritmo_estudiante import AlgoritmoEstudiante
+from services.algoritmo_profesor import AlgoritmoProfesor
 
 class AlgoritmoRecomendacion:
     """Clase principal para ejecutar el algoritmo de recomendación de profesores"""

@@ -3,11 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 
-from src.api.rutas_estudiantes import router as estudiantes_router
-from src.api.rutas_profesores import router as profesores_router
-from src.api.rutas import router as rutas_generales
-from src.database.neo4jdriver import Neo4jDriver
-from src.config import API_PREFIX, DEBUG
+from api.rutas_estudiantes import router as estudiantes_router
+from api.rutas_profesores import router as profesores_router
+from api.rutas import router as rutas_generales
+from database.neo4jdriver import Neo4jDriver
+from config import API_PREFIX, DEBUG
 
 # Manejador de contexto para inicializar y cerrar recursos
 @asynccontextmanager

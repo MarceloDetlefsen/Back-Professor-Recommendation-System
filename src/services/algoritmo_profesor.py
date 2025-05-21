@@ -1,5 +1,5 @@
-from src.database.neo4jdriver import Neo4jDriver
-from src.models.profesor import Profesor
+from database.neo4jdriver import Neo4jDriver
+from models.profesor import Profesor
 
 class AlgoritmoProfesor:
     """Clase para gestionar operaciones relacionadas con profesores en Neo4j"""

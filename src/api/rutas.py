@@ -1,9 +1,9 @@
-from src.database.neo4jdriver import Neo4jDriver
+from database.neo4jdriver import Neo4jDriver
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
 
-from src.services.algoritmo_de_recomendacion import AlgoritmoRecomendacion
-from src.utils.helpers import create_response
+from services.algoritmo_de_recomendacion import AlgoritmoRecomendacion
+from utils.helpers import create_response
 
 router = APIRouter()
 

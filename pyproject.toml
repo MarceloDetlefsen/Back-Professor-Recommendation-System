@@ -1,19 +1,22 @@
-[project]
-name = "back-professor-recommendation-system"
-version = "0.1.0"
-description = ""
-authors = [
-    {name = "Marcelo Detlefsen",email = "83415711+MarceloDetlefsen@users.noreply.github.com"}
-]
-readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
-]
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-packages = [{include = "back_professor_recommendation_system", from = "src"}]
+name = "back-professor-recommendation-system"
+version = "0.1.0"
+packages = [
+    {include = "src", from = "."},
+    {include = "scripts", from = "."}
+]
 
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.109.0"
+neo4j = "^5.17.0"
+python-dotenv = "^1.0.0"
+uvicorn = "^0.27.0"
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
