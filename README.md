@@ -47,6 +47,12 @@ pip install -r requisitos.txt
    DEBUG=True
    ```
 
+   - Editar el archivo `config.py`en el source del proyecto con la siguiente información:
+   ```
+  NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+  NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
+  NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "tu_contraseña") //Modificar esto
+
 ## Iniciar la aplicación
 
 1. Se ponen de momento asi datos en la base datos.

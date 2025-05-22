@@ -1,0 +1,37 @@
+# Entornos virtuales
+venv/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Configuración de VS Code
+.vscode/
+
+# Archivos de base de datos local
+*.sqlite
+*.db
+
+# Archivos de Neo4j (si son locales)
+data/
+logs/
+plugins/
+
+# Archivos generados por el sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de instalación de paquetes
+*.egg-info/
+dist/
+build/
+
+# Archivos de pruebas y cobertura
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Archivos de sistema operativo
+*.swp
+*.swo

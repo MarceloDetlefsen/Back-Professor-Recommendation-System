@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Script para inicializar la base de datos Neo4j con datos de prueba
 para el sistema de recomendación de profesores
