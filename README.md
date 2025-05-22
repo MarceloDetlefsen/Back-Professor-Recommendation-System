@@ -17,9 +17,38 @@ Este sistema utiliza un algoritmo basado en grafos para recomendar profesores a 
 
 - Python 3.10+
 - Neo4j (instancia local o en la nube)
-- Dependencias listadas en requisitos.txt
+- Poetry (para gestión de dependencias)
+- Dependencias listadas en pyproject.toml
 
 ## Instalación
+
+### 1. Instalar Poetry
+
+1. Descargar e instalar Poetry (recomendado):
+```bash
+# Windows (PowerShell)
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+
+# Linux/macOS
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+2. Agregar Poetry al PATH (si no se agregó automáticamente):
+```
+# Windows
+setx PATH "%PATH%;%APPDATA%\Python\Scripts"
+
+# Linux/macOS
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+3. Verificar la instalación:
+```
+poetry --version
+```
+
+### 2. Modificaciones
 
 1. Clonar el repositorio:
 ```bash
@@ -29,17 +58,13 @@ cd back-professor-recommendation-system
 
 2. Crear y activar un entorno virtual:
 ```bash
-python -m venv venv
-venv\Scripts\activate
+poetry install  # Instala todas las dependencias
+poetry shell    # Activa el entorno virtual
 ```
 
-3. Instalar dependencias:
-```bash
-pip install -r requisitos.txt
-```
+3. Configurar variables de entorno:
 
-4. Configurar variables de entorno:
-   - Editar el archivo `.env` en la raíz del proyecto con la siguiente información:
+Editar el archivo `.env` en la raíz del proyecto con la siguiente información:
    ```
    NEO4J_URI=bolt://localhost:7687
    NEO4J_USER=neo4j
@@ -47,11 +72,12 @@ pip install -r requisitos.txt
    DEBUG=True
    ```
 
-   - Editar el archivo `config.py`en el source del proyecto con la siguiente información:
+Editar el archivo `config.py`en el source del proyecto con la siguiente información:
    ```
   NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
   NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
   NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "tu_contraseña") //Modificar esto
+  ```
 
 ## Iniciar la aplicación
 
@@ -74,15 +100,13 @@ Luego de iniciar la aplicación, puedes acceder a la documentación interactiva:
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
-**Queda pendiente conectar el back con el front**
-
 ## Estructura del proyecto
 
 ```
 Back-Professor-Recommendation-System/
 ├── scripts/
-|   ├── __init__.py
-|   ├── init_db.py
+│   ├── __init__.py
+│   ├── init_db.py
 ├── src/
 │   ├── api/
 │   │   ├── __init__.py
@@ -115,6 +139,7 @@ Back-Professor-Recommendation-System/
 │   └── base_datos.py
 ├── venv/
 ├── .env
+├── .gitignore
 ├── pyproject.toml
 ├── README.md
 └── requisitos.txt
