@@ -4,11 +4,13 @@ venv/
 # Archivos de Poetry
 poetry.lock
 
-# Archivos de caché de Python
+# Archivos de caché de Python - todas las variantes posibles
 __pycache__/
+_pycache_/
 *.py[cod]
 *$py.class
 *.pyc
+src/database/__pycache__
 
 # Configuración de VS Code
 .vscode/
