@@ -144,7 +144,6 @@ Back-Professor-Recommendation-System/
 ├── poetry.lock
 ├── pyproject.toml
 ├── README.md
-└── requisitos.txt
 ```
 
 # Modelos de datos
