@@ -1,10 +1,14 @@
 # Entornos virtuales
 venv/
 
+# Archivos de Poetry
+poetry.lock
+
 # Archivos de caché de Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 
 # Configuración de VS Code
 .vscode/

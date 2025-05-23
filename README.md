@@ -59,7 +59,6 @@ cd back-professor-recommendation-system
 2. Crear y activar un entorno virtual:
 ```bash
 poetry install  # Instala todas las dependencias
-poetry shell    # Activa el entorno virtual
 ```
 
 3. Configurar variables de entorno:
@@ -83,12 +82,14 @@ Editar el archivo `config.py`en el source del proyecto con la siguiente informac
 
 1. Se ponen de momento asi datos en la base datos.
 ```bash
-poetry run python -m scripts.init_db
+poetry run python -m scripts.init_db // <------- A mi me funciona esta
+poetry run python scripts/init_db.py
 ```
 
 2. Se ejecuta el programa
 ```bash
 poetry run python -m src.main
+poetry run python src/main.py // <------- A mi me funciona esta
 ```
 
 La API estará disponible en `http://localhost:8000`
@@ -140,6 +141,7 @@ Back-Professor-Recommendation-System/
 ├── venv/
 ├── .env
 ├── .gitignore
+├── poetry.lock
 ├── pyproject.toml
 ├── README.md
 └── requisitos.txt

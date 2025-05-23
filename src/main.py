@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from api.rutas_estudiantes import router as estudiantes_router
 from api.rutas_profesores import router as profesores_router
+from api.rutas_cursos import router as cursos_router
 from api.rutas import router as rutas_generales
 from database.neo4jdriver import Neo4jDriver
 from config import API_PREFIX, DEBUG
@@ -43,6 +44,7 @@ app.add_middleware(
 # Incluir los routers
 app.include_router(estudiantes_router, prefix=f"{API_PREFIX}/estudiantes", tags=["Estudiantes"])
 app.include_router(profesores_router, prefix=f"{API_PREFIX}/profesores", tags=["Profesores"])
+app.include_router(cursos_router, prefix=f"{API_PREFIX}/cursos", tags=["Cursos"])
 app.include_router(rutas_generales, prefix=API_PREFIX, tags=["General"])
 
 # Ruta raíz
