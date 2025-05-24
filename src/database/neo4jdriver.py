@@ -1,5 +1,5 @@
 from neo4j import GraphDatabase
-from src.config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 class Neo4jDriver:
     """Clase para manejar la conexión con Neo4j y ejecutar consultas"""
@@ -28,6 +28,10 @@ class Neo4jDriver:
             self.driver.close()
             print("Conexión a Neo4j cerrada")
     
+    def get_session(self):
+        """Retorna una nueva sesión de Neo4j"""
+        return self.driver.session()
+    
     def execute_read(self, query, **params):
         """Ejecuta una consulta de lectura en Neo4j"""
         with self.driver.session() as session:
@@ -44,3 +48,9 @@ class Neo4jDriver:
         """Ejecuta una función dentro de una transacción"""
         with self.driver.session() as session:
             return session.execute_write(func, *args, **kwargs)
+    
+    def run_query(self, query, **params):
+        """Método alternativo para ejecutar consultas (compatibilidad)"""
+        with self.driver.session() as session:
+            result = session.run(query, **params)
+            return [record for record in result]

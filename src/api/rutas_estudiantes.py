@@ -20,35 +20,160 @@ async def crear_estudiante(estudiante: Estudiante):
         Datos del estudiante creado
     """
     try:
-        # Validar estilos
-        if not validate_learning_style(estudiante.estilo_aprendizaje):
-            raise HTTPException(status_code=400, detail="Estilo de aprendizaje no válido")
-            
-        if not validate_class_style(estudiante.estilo_clase):
-            raise HTTPException(status_code=400, detail="Estilo de clase no válido")
-        
         # Calcular puntuación
         estudiante.calcular_puntuacion()
         
-        # Registrar en la base de datos
-        algoritmo = AlgoritmoEstudiante()
-        nuevo_estudiante = algoritmo.registrar_estudiante(estudiante)
-        
-        if not nuevo_estudiante:
-            raise HTTPException(status_code=500, detail="Error al crear el estudiante")
+        # Verificar si el estudiante ya existe por carnet
+        driver = Neo4jDriver()
+        session = driver.get_session()
+        try:
+            # Verificar carnet
+            query_existe = """
+            MATCH (e:Estudiante {carnet: $carnet})
+            RETURN e
+            """
+            result_carnet = session.run(query_existe, carnet=estudiante.carnet)
+            if result_carnet.single():
+                raise HTTPException(status_code=400, detail="El carnet ya está registrado")
             
-        return create_response(
-            data=nuevo_estudiante,
-            message="Estudiante creado exitosamente"
-        )
+            # Verificar email
+            query_email = """
+            MATCH (e:Estudiante {email: $email})
+            RETURN e
+            """
+            result_email = session.run(query_email, email=estudiante.email)
+            if result_email.single():
+                raise HTTPException(status_code=400, detail="El email ya está registrado")
+            
+            # Crear el estudiante
+            query_crear = """
+            CREATE (e:Estudiante {
+                nombre: $nombre,
+                carnet: $carnet,
+                carrera: $carrera,
+                pensum: $pensum,
+                email: $email,
+                password: $password,
+                estilo_aprendizaje: $estilo_aprendizaje,
+                estilo_clase: $estilo_clase,
+                promedio: $promedio,
+                grado: $grado,
+                carga_maxima: $carga_maxima,
+                cursos_zona_minima: $cursos_zona_minima,
+                asistencias: $asistencias,
+                veces_curso: $veces_curso,
+                puntuacion_total: $puntuacion_total,
+                fecha_registro: datetime()
+            })
+            RETURN e
+            """
+            
+            # Convertir el modelo a diccionario
+            datos_estudiante = estudiante.dict()
+            
+            result = session.run(query_crear, **datos_estudiante)
+            nuevo_estudiante = result.single()
+            
+            if not nuevo_estudiante:
+                raise HTTPException(status_code=500, detail="Error al crear el estudiante")
+            
+            # Preparar respuesta sin incluir la contraseña
+            datos_respuesta = dict(nuevo_estudiante["e"])
+            datos_respuesta.pop("password", None)  # Remover password de la respuesta
+            
+            return {
+                "success": True,
+                "message": "Estudiante registrado exitosamente",
+                "data": datos_respuesta
+            }
+        finally:
+            session.close()
+    
+    except HTTPException:
+        raise
     except Exception as e:
-        # Si es un error de validación de Pydantic, ya se maneja en FastAPI
-        if not isinstance(e, HTTPException):
-            raise HTTPException(status_code=500, detail=f"Error al crear estudiante: {str(e)}")
-        raise e
+        print(f"Error detallado: {str(e)}")  # Para debugging
+        raise HTTPException(status_code=500, detail=f"Error al crear estudiante: {str(e)}")
 
-@router.get("/{nombre}")
-async def obtener_estudiante(nombre: str):
+@router.get("/")
+async def listar_estudiantes():
+    """
+    Lista todos los estudiantes
+    
+    Returns:
+        Lista de todos los estudiantes
+    """
+    try:
+        driver = Neo4jDriver()
+        session = driver.get_session()
+        try:
+            query = """
+            MATCH (e:Estudiante)
+            RETURN e
+            ORDER BY e.nombre
+            """
+            result = session.run(query)
+            estudiantes = []
+            
+            for record in result:
+                estudiante_data = dict(record["e"])
+                estudiante_data.pop("password", None)  # No incluir password
+                estudiantes.append(estudiante_data)
+            
+            return {
+                "success": True,
+                "message": f"Se encontraron {len(estudiantes)} estudiantes",
+                "data": estudiantes
+            }
+        finally:
+            session.close()
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener estudiantes: {str(e)}")
+
+@router.get("/{carnet}")
+async def obtener_estudiante_por_carnet(carnet: str):
+    """
+    Obtiene un estudiante por su carnet
+    
+    Args:
+        carnet: Carnet del estudiante a buscar
+        
+    Returns:
+        Datos del estudiante
+    """
+    try:
+        driver = Neo4jDriver()
+        session = driver.get_session()
+        try:
+            query = """
+            MATCH (e:Estudiante {carnet: $carnet})
+            RETURN e
+            """
+            result = session.run(query, carnet=carnet)
+            record = result.single()
+            
+            if not record:
+                raise HTTPException(status_code=404, detail=f"No se encontró al estudiante con carnet {carnet}")
+            
+            estudiante_data = dict(record["e"])
+            estudiante_data.pop("password", None)  # No incluir password
+            
+            return {
+                "success": True,
+                "message": f"Estudiante con carnet {carnet} encontrado",
+                "data": estudiante_data
+            }
+        finally:
+            session.close()
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener estudiante: {str(e)}")
+
+@router.get("/nombre/{nombre}")
+async def obtener_estudiante_por_nombre(nombre: str):
     """
     Obtiene un estudiante por su nombre
     
@@ -69,10 +194,10 @@ async def obtener_estudiante(nombre: str):
             data=estudiante,
             message=f"Estudiante {nombre} encontrado"
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        if not isinstance(e, HTTPException):
-            raise HTTPException(status_code=500, detail=f"Error al obtener estudiante: {str(e)}")
-        raise e
+        raise HTTPException(status_code=500, detail=f"Error al obtener estudiante: {str(e)}")
 
 @router.get("/{nombre}/similares")
 async def obtener_estudiantes_similares(nombre: str):
@@ -100,111 +225,199 @@ async def obtener_estudiantes_similares(nombre: str):
             data=similares,
             message=f"Se encontraron {len(similares)} estudiantes similares a {nombre}"
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        if not isinstance(e, HTTPException):
-            raise HTTPException(status_code=500, detail=f"Error al buscar estudiantes similares: {str(e)}")
-        raise e
+        raise HTTPException(status_code=500, detail=f"Error al buscar estudiantes similares: {str(e)}")
 
-@router.put("/{nombre}")
+@router.put("/{carnet}")
 async def actualizar_estudiante(
-    nombre: str,
+    carnet: str,
     datos_actualizados: dict = Body(...)
 ):
     """
     Actualiza los datos de un estudiante existente
     
     Args:
-        nombre: Nombre del estudiante a actualizar
+        carnet: Carnet del estudiante a actualizar
         datos_actualizados: Datos a actualizar
         
     Returns:
         Datos del estudiante actualizado
     """
     try:
-        algoritmo = AlgoritmoEstudiante()
-        
-        # Verificar que el estudiante existe
-        estudiante_existente = algoritmo.obtener_estudiante(nombre)
-        if not estudiante_existente:
-            raise HTTPException(status_code=404, detail=f"No se encontró al estudiante con nombre {nombre}")
-        
-        # Validar estilos si se van a actualizar
-        if "estilo_aprendizaje" in datos_actualizados and not validate_learning_style(datos_actualizados["estilo_aprendizaje"]):
-            raise HTTPException(status_code=400, detail="Estilo de aprendizaje no válido")
+        driver = Neo4jDriver()
+        session = driver.get_session()
+        try:
+            # Verificar que el estudiante existe
+            query_existe = """
+            MATCH (e:Estudiante {carnet: $carnet})
+            RETURN e
+            """
+            result = session.run(query_existe, carnet=carnet)
+            estudiante_existente = result.single()
             
-        if "estilo_clase" in datos_actualizados and not validate_class_style(datos_actualizados["estilo_clase"]):
-            raise HTTPException(status_code=400, detail="Estilo de clase no válido")
+            if not estudiante_existente:
+                raise HTTPException(status_code=404, detail=f"No se encontró al estudiante con carnet {carnet}")
+            
+            # Validar estilos si se van a actualizar
+            if "estilo_aprendizaje" in datos_actualizados:
+                if not validate_learning_style(datos_actualizados["estilo_aprendizaje"]):
+                    raise HTTPException(status_code=400, detail="Estilo de aprendizaje no válido")
+                
+            if "estilo_clase" in datos_actualizados:
+                if not validate_class_style(datos_actualizados["estilo_clase"]):
+                    raise HTTPException(status_code=400, detail="Estilo de clase no válido")
+            
+            # Construir la consulta para actualizar sólo los campos proporcionados
+            update_fields = []
+            params = {"carnet": carnet}
+            
+            for key, value in datos_actualizados.items():
+                if key not in ["carnet"]:  # No permitir cambiar el carnet
+                    update_fields.append(f"e.{key} = ${key}")
+                    params[key] = value
+            
+            if not update_fields:
+                estudiante_data = dict(estudiante_existente["e"])
+                estudiante_data.pop("password", None)
+                return {
+                    "success": True,
+                    "message": "No se proporcionaron campos para actualizar",
+                    "data": estudiante_data
+                }
+            
+            # Ejecutar la actualización
+            query_update = f"""
+            MATCH (e:Estudiante {{carnet: $carnet}})
+            SET {', '.join(update_fields)}
+            RETURN e
+            """
+            
+            result_update = session.run(query_update, **params)
+            updated_record = result_update.single()
+            
+            if not updated_record:
+                raise HTTPException(status_code=500, detail="Error al actualizar el estudiante")
+            
+            # Preparar respuesta
+            estudiante_data = dict(updated_record["e"])
+            estudiante_data.pop("password", None)
+            
+            return {
+                "success": True,
+                "message": f"Estudiante con carnet {carnet} actualizado exitosamente",
+                "data": estudiante_data
+            }
+        finally:
+            session.close()
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al actualizar estudiante: {str(e)}")
+
+@router.delete("/{carnet}")
+async def eliminar_estudiante(carnet: str):
+    """
+    Elimina un estudiante por su carnet
+    
+    Args:
+        carnet: Carnet del estudiante a eliminar
         
-        # Construir la consulta para actualizar sólo los campos proporcionados
-        update_fields = []
-        params = {"nombre": nombre}
+    Returns:
+        Confirmación de eliminación
+    """
+    try:
+        driver = Neo4jDriver()
+        session = driver.get_session()
+        try:
+            # Verificar que el estudiante existe
+            query_existe = """
+            MATCH (e:Estudiante {carnet: $carnet})
+            RETURN e
+            """
+            result = session.run(query_existe, carnet=carnet)
+            if not result.single():
+                raise HTTPException(status_code=404, detail=f"No se encontró al estudiante con carnet {carnet}")
+            
+            # Eliminar el estudiante
+            query_delete = """
+            MATCH (e:Estudiante {carnet: $carnet})
+            DELETE e
+            RETURN COUNT(e) as deleted_count
+            """
+            result_delete = session.run(query_delete, carnet=carnet)
+            deleted = result_delete.single()
+            
+            if deleted["deleted_count"] == 0:
+                raise HTTPException(status_code=500, detail="Error al eliminar el estudiante")
+            
+            return {
+                "success": True,
+                "message": f"Estudiante con carnet {carnet} eliminado exitosamente"
+            }
+        finally:
+            session.close()
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar estudiante: {str(e)}")
+
+@router.post("/login")
+async def login_estudiante(credenciales: dict = Body(...)):
+    """
+    Autentica un estudiante
+    
+    Args:
+        credenciales: Dict con carnet/email y password
         
-        for key, value in datos_actualizados.items():
-            if key != "nombre":  # No permitir cambiar el nombre (clave primaria)
-                update_fields.append(f"e.{key} = ${key}")
-                params[key] = value
+    Returns:
+        Datos del estudiante autenticado
+    """
+    try:
+        if "carnet" not in credenciales and "email" not in credenciales:
+            raise HTTPException(status_code=400, detail="Se requiere carnet o email")
         
-        if not update_fields:
-            return create_response(
-                data=estudiante_existente,
-                message="No se proporcionaron campos para actualizar"
-            )
-        
-        # Ejecutar la actualización
-        query = f"""
-        MATCH (e:Estudiante {{nombre: $nombre}})
-        SET {', '.join(update_fields)}
-        RETURN e
-        """
+        if "password" not in credenciales:
+            raise HTTPException(status_code=400, detail="Se requiere password")
         
         driver = Neo4jDriver()
-        result = driver.execute_write(query, **params)
-        
-        if not result:
-            raise HTTPException(status_code=500, detail="Error al actualizar el estudiante")
-            
-        # Recalcular puntuación si se actualizaron campos relevantes
-        relevant_fields = {"promedio", "asistencias_curso_anterior", "veces_que_llevo_curso"}
-        if any(field in datos_actualizados for field in relevant_fields):
-            # Obtener el estudiante actualizado
-            updated_data = result[0]["e"]
-            
-            # Crear un objeto Estudiante para recalcular puntuación
-            estudiante = Estudiante(
-                nombre=updated_data["nombre"],
-                estilo_aprendizaje=updated_data["estilo_aprendizaje"],
-                estilo_clase=updated_data["estilo_clase"],
-                promedio=updated_data["promedio"],
-                asistencias=updated_data["asistencias_curso_anterior"],
-                veces_curso=updated_data["veces_que_llevo_curso"]
-            )
-            
-            # Recalcular puntuación
-            puntuacion = estudiante.calcular_puntuacion()
-            
-            # Actualizar puntuación en base de datos
-            driver.execute_write(
+        session = driver.get_session()
+        try:
+            # Buscar por carnet o email
+            if "carnet" in credenciales:
+                query = """
+                MATCH (e:Estudiante {carnet: $identifier, password: $password})
+                RETURN e
                 """
-                MATCH (e:Estudiante {nombre: $nombre})
-                SET e.puntuacion_total = $puntuacion
-                """,
-                nombre=nombre,
-                puntuacion=puntuacion
-            )
+                identifier = credenciales["carnet"]
+            else:
+                query = """
+                MATCH (e:Estudiante {email: $identifier, password: $password})
+                RETURN e
+                """
+                identifier = credenciales["email"]
             
-            # Obtener el estudiante con la puntuación actualizada
-            updated_estudiante = algoritmo.obtener_estudiante(nombre)
+            result = session.run(query, identifier=identifier, password=credenciales["password"])
+            record = result.single()
             
-            return create_response(
-                data=updated_estudiante,
-                message=f"Estudiante {nombre} actualizado con puntuación recalculada"
-            )
-        
-        return create_response(
-            data=result[0]["e"],
-            message=f"Estudiante {nombre} actualizado exitosamente"
-        )
+            if not record:
+                raise HTTPException(status_code=401, detail="Credenciales inválidas")
+            
+            estudiante_data = dict(record["e"])
+            estudiante_data.pop("password", None)  # No incluir password en respuesta
+            
+            return {
+                "success": True,
+                "message": "Login exitoso",
+                "data": estudiante_data
+            }
+        finally:
+            session.close()
+    
+    except HTTPException:
+        raise
     except Exception as e:
-        if not isinstance(e, HTTPException):
-            raise HTTPException(status_code=500, detail=f"Error al actualizar estudiante: {str(e)}")
-        raise e
+        raise HTTPException(status_code=500, detail=f"Error en login: {str(e)}")
