@@ -112,12 +112,12 @@ def crear_estudiantes() -> list:
             email=f"estudiante{i}@universidad.edu",
             password=f"pass{i*123}",
             estilo_aprendizaje=random.choice(["mixto", "practico", "teorico"]),
-            estilo_clase=random.choice(["con_tecnologia", "sin_tecnologia", "mixto"]),
+            estilo_clase=random.choice(["Uso de herramientas tecnológicas", "Sin uso de herramientas tecnológicas", "Mixto"]),
             promedio=random.randint(65, 95),
             grado=f"{random.choice(['Primer', 'Segundo', 'Tercer'])} año",
             carga_maxima=random.randint(4, 6),
             cursos_zona_minima=random.randint(0, 2),
-            asistencias=random.randint(0, 6),
+            asistencias=random.randint(0, 5),
             veces_curso=random.randint(0, 4),
             puntuacion_total=random.randint(0, 100),
             fecha_registro=fake.date_between(start_date="-2y", end_date="today"),
@@ -266,7 +266,7 @@ def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudi
         ("Dr. Jorge Pérez", "MAT203"),  # Algebra y geometría analítica
         ("Dr. Jorge Pérez", "MAT301"),  # Pensamiento cuantitativo
 
-        ("MSc. Patricia López", "MAT301")  # Pensamiento cuantitativo
+        ("MSc. Patricia López", "MAT301"),  # Pensamiento cuantitativo
         ("MSc. Patricia López", "MAT202"),  # Matemática discreta
 
         ("Dr. Ricardo Sánchez", "MAT101"),  # Cálculo 1
@@ -278,7 +278,7 @@ def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudi
         ("Prof. Javier Torres", "MAT202"),  # Matemática discreta
         ("Prof. Javier Torres", "MAT203"),  # Algebra y geometría analítica
         
-        ("Dra. Carmen Castro", "MAT301")   # Pensamiento cuantitativo
+        ("Dra. Carmen Castro", "MAT301"),   # Pensamiento cuantitativo
         ("Dra. Carmen Castro", "MAT104"),  # Cálculo 2
         
         ("Dr. Fernando Díaz", "MAT101"),  # Cálculo 1
@@ -372,14 +372,14 @@ def main():
     if respuesta.lower() == 's':
         limpiar_base_datos()
     
-    # Crear restricciones (para garantizar unicidad)
     crear_restricciones()
     
     # Inicializar datos
-    crear_cursos()
-    crear_estudiantes()
-    crear_profesores()
-    crear_relaciones()
+    cursos = crear_cursos()
+    estudiantes = crear_estudiantes()
+    profesores = crear_profesores()
+    driver = Neo4jDriver()
+    crear_relaciones(driver, cursos, profesores, estudiantes)
     
     print("\nBase de datos inicializada correctamente! 🎉")
     print("\nPuedes ejecutar el API con el comando:")
