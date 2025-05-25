@@ -303,12 +303,13 @@ def comprobar_conexion():
 
 def crear_estudiantes(driver=None) -> list:
     """Genera los estudiantes en el sistema sin fecha_registro"""
+    fake = Faker('es_ES')
     carreras = ["Ingeniería en Ciencias de la Computación", "Matemática Aplicada", "Física"]
     estudiantes = []
     
-    for i in range(1, 73):
+    for i in range(1, 21):
         estudiantes.append({
-            "nombre": f"Estudiante {i}",
+            "nombre": fake.name(),
             "carnet": f"24{str(i).zfill(3)}",
             "carrera": random.choice(carreras),
             "pensum": 2023,
@@ -323,6 +324,41 @@ def crear_estudiantes(driver=None) -> list:
             "asistencias": random.randint(0, 5),
             "veces_curso": random.randint(0, 4)
         })
+
+    estudiantes.extend([
+        {
+            "nombre": "estudiantelogin",
+            "carnet": "99999",
+            "carrera": random.choice(carreras),
+            "pensum": 2023,
+            "email": "estudiante@uvg.edu.gt",
+            "password": "password123",
+            "estilo_aprendizaje": "mixto",
+            "estilo_clase": "mixto",
+            "promedio": 1,
+            "grado": "Segundo año",
+            "carga_maxima": 5,
+            "cursos_zona_minima": 1,
+            "asistencias": 3,
+            "veces_curso": 3
+        },
+        {
+            "nombre": "adminlogin",
+            "carnet": "77777",
+            "carrera": "Administración del Sistema",
+            "pensum": 2023,
+            "email": "admin@uvg.edu.gt",
+            "password": "admin123",
+            "estilo_aprendizaje": "mixto",
+            "estilo_clase": "mixto",
+            "promedio": 1,
+            "grado": "Primer año",
+            "carga_maxima": 5,
+            "cursos_zona_minima": 2,
+            "asistencias": 2,
+            "veces_curso": 3
+        }
+    ])
     
     close_driver = False
     if driver is None:
