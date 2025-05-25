@@ -2,13 +2,19 @@
 Script para inicializar la base de datos Neo4j con datos de prueba
 para el sistema de recomendación de profesores
 """
-
+import random
+from faker import Faker
+from datetime import datetime
 import sys
+
 from src.database.neo4jdriver import Neo4jDriver
 from src.models.estudiante import Estudiante
 from src.models.profesor import Profesor
 from src.models.curso import Curso
 import os
+
+fake = Faker("es_ES")
+random.seed(datetime.now().timestamp())
 
 def limpiar_base_datos():
     """Elimina todos los nodos y relaciones de la base de datos"""
@@ -34,175 +40,308 @@ def crear_restricciones():
     
     print("Restricciones creadas correctamente")
 
-def crear_cursos():
-    """Crea cursos de ejemplo en la base de datos"""
-    driver = Neo4jDriver()
-    
-    cursos = [
-        Curso(nombre="Cálculo 1", codigo="MAT103", departamento="Matemáticas", creditos=4),
-        Curso(nombre="Física General", codigo="FIS101", departamento="Física", creditos=5),
-        Curso(nombre="Programación Básica", codigo="INF110", departamento="Informática", creditos=3),
-        Curso(nombre="Estadística", codigo="EST201", departamento="Matemáticas", creditos=3),
-        Curso(nombre="Bases de Datos", codigo="INF210", departamento="Informática", creditos=4)
-    ]
-    
-    for curso in cursos:
-        query = """
-        MERGE (c:Curso {
-            nombre: $nombre,
-            codigo: $codigo,
-            departamento: $departamento,
-            creditos: $creditos
-        })
-        RETURN c
-        """
-        
-        driver.execute_write(
-            query,
-            nombre=curso.nombre,
-            codigo=curso.codigo,
-            departamento=curso.departamento,
-            creditos=curso.creditos
+"""Se crean los cursos a utilizarse en el sistema de recomendación según los datos recopilados"""
+def crear_cursos() -> list:
+    return [
+        Curso(
+            nombre="Cálculo 1",
+            codigo="MAT101",
+            departamento="Matemáticas",
+            creditos=4
+        ),
+        Curso(
+            nombre="Álgebra Lineal",
+            codigo="MAT102",
+            departamento="Matemáticas",
+            creditos=3
+        ),
+        Curso(
+            nombre="Ecuaciones Diferenciales",
+            codigo="MAT201",
+            departamento="Matemáticas",
+            creditos=4
+        ),
+        Curso(
+            nombre="Estadística",
+            codigo="MAT103",
+            departamento="Matemáticas",
+            creditos=3
+        ),
+        Curso(
+            nombre="Cálculo 2",
+            codigo="MAT104",
+            departamento="Matemáticas",
+            creditos=4
+        ),
+        Curso(
+            nombre="Matemática discreta",
+            codigo="MAT202",
+            departamento="Matemáticas",
+            creditos=3
+        ),
+        Curso(
+            nombre="Algebra y geometría analítica",	
+            codigo="MAT203",
+            departamento="Matemáticas",
+            creditos=4
+        ),
+        Curso(
+            nombre="Pensamiento cuantitativo",
+            codigo="MAT301",
+            departamento="Matemáticas",
+            creditos=5
         )
-    
-    print(f"Se han creado {len(cursos)} cursos de ejemplo")
-
-def crear_estudiantes():
-    """Crea estudiantes de ejemplo en la base de datos"""
-    estudiantes = [
-        Estudiante(nombre="Juan Pérez", estilo_aprendizaje="visual", estilo_clase="presencial", promedio=85, asistencias=4, veces_curso=1),
-        Estudiante(nombre="María López", estilo_aprendizaje="teórico", estilo_clase="virtual", promedio=92, asistencias=5, veces_curso=1),
-        Estudiante(nombre="Carlos Rodríguez", estilo_aprendizaje="práctico", estilo_clase="presencial", promedio=78, asistencias=3, veces_curso=2),
-        Estudiante(nombre="Ana Martínez", estilo_aprendizaje="visual", estilo_clase="virtual", promedio=88, asistencias=4, veces_curso=1),
-        Estudiante(nombre="Pedro Gómez", estilo_aprendizaje="teórico", estilo_clase="presencial", promedio=75, asistencias=2, veces_curso=3)
     ]
+
+"""Se crean los estudiantes a utilizarse en el sistema de recomendación según los datos recopilados"""
+def crear_estudiantes() -> list:
+    carreras = [
+        "Ingeniería en Ciencias de la Computación y Tecnologías de la Información", "Ingeniería Mecatrónica", 
+        "Matemática Aplicada", "Física", "Bioquímica y microbiología",
+    ]
+    
+    carnet = 24000
+    cantidad_estudiantes = 70
+    estudiantes = []
+    for i in range(1, cantidad_estudiantes + 1):
+        estudiantes.append(Estudiante(
+            nombre=f"Estudiante {i}",
+            pensum=2023,
+            carnet=f"{carnet + i}",
+            carrera=random.choice(carreras),
+            email=f"estudiante{i}@universidad.edu",
+            password=f"pass{i*123}",
+            estilo_aprendizaje=random.choice(["mixto", "practico", "teorico"]),
+            estilo_clase=random.choice(["con_tecnologia", "sin_tecnologia", "mixto"]),
+            promedio=random.randint(65, 95),
+            grado=f"{random.choice(['Primer', 'Segundo', 'Tercer'])} año",
+            carga_maxima=random.randint(4, 6),
+            cursos_zona_minima=random.randint(0, 2),
+            asistencias=random.randint(0, 6),
+            veces_curso=random.randint(0, 4),
+            puntuacion_total=random.randint(0, 100),
+            fecha_registro=fake.date_between(start_date="-2y", end_date="today"),
+        ))
+    return estudiantes
+
+"""Genera los profesores a utilizarse en el sistema de recomendación según los datos recopilados"""
+def crear_profesores() -> list:
+    profesores = [
+        {
+            "nombre": "Dr. Carlos Martínez",
+            "estilo": "teórico",
+            "clase": "presencial",
+            "exp": 15,
+            "eval": 4.8,
+            "aprob": 85,
+            "disp": 4
+        },
+        {
+            "nombre": "Dra. Ana Rodríguez",
+            "estilo": "visual",
+            "clase": "virtual",
+            "exp": 10,
+            "eval": 4.5,
+            "aprob": 80,
+            "disp": 3
+        },
+        {
+            "nombre": "Prof. Luis García",
+            "estilo": "práctico",
+            "clase": "presencial",
+            "exp": 8,
+            "eval": 4.2,
+            "aprob": 75,
+            "disp": 5
+        },
+        {
+            "nombre": "Dra. Sofía Hernández",
+            "estilo": "teórico",
+            "clase": "virtual",
+            "exp": 20,
+            "eval": 4.9,
+            "aprob": 90,
+            "disp": 3
+        },
+        {
+            "nombre": "Dr. Jorge Pérez",
+            "estilo": "visual",
+            "clase": "presencial",
+            "exp": 12,
+            "eval": 4.6,
+            "aprob": 82,
+            "disp": 4
+        },
+        {
+            "nombre": "MSc. Patricia López",
+            "estilo": "práctico",
+            "clase": "virtual",
+            "exp": 6,
+            "eval": 4.0,
+            "aprob": 78,
+            "disp": 5
+        },
+        {
+            "nombre": "Dr. Ricardo Sánchez",
+            "estilo": "teórico",
+            "clase": "presencial",
+            "exp": 18,
+            "eval": 4.7,
+            "aprob": 88,
+            "disp": 2
+        },
+        {
+            "nombre": "Dra. Elena Ramírez",
+            "estilo": "visual",
+            "clase": "virtual",
+            "exp": 9,
+            "eval": 4.3,
+            "aprob": 79,
+            "disp": 4
+        },
+        {
+            "nombre": "Prof. Javier Torres",
+            "estilo": "práctico",
+            "clase": "presencial",
+            "exp": 7,
+            "eval": 4.1,
+            "aprob": 76,
+            "disp": 5
+        },
+        {
+            "nombre": "Dra. Carmen Castro",
+            "estilo": "teórico",
+            "clase": "virtual",
+            "exp": 14,
+            "eval": 4.7,
+            "aprob": 86,
+            "disp": 3
+        },
+        {
+            "nombre": "Dr. Fernando Díaz",
+            "estilo": "visual",
+            "clase": "presencial",
+            "exp": 11,
+            "eval": 4.4,
+            "aprob": 81,
+            "disp": 4
+        },
+        {
+            "nombre": "MSc. Adriana Morales",
+            "estilo": "práctico",
+            "clase": "virtual",
+            "exp": 5,
+            "eval": 3.9,
+            "aprob": 74,
+            "disp": 5
+        }
+    ]
+    
+    return [Profesor(
+        nombre=p["nombre"],
+        estilo_enseñanza=p["estilo"],
+        estilo_clase=p["clase"],
+        años_experiencia=p["exp"],
+        evaluacion_docente=p["eval"],
+        porcentaje_aprobados=p["aprob"],
+        disponibilidad=p["disp"]
+    ) for p in profesores]
+
+
+def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudiantes: list):
+    
+    asignaciones_profesor_curso = [
+        ("Dr. Carlos Martínez", "MAT101"),  # Cálculo 1
+        ("Dr. Carlos Martínez", "MAT104"),  # Cálculo 2
+
+        ("Dra. Ana Rodríguez", "MAT102"),  # Álgebra Lineal
+        ("Dra. Ana Rodríguez", "MAT202"),  # Matemática discreta
+        
+        ("Prof. Luis García", "MAT103"),   # Estadística
+        ("Prof. Luis García", "MAT201"),   # Ecuaciones Diferenciales
+        
+        ("Dra. Sofía Hernández", "MAT201"),  # Ecuaciones Diferenciales
+        ("Dra. Sofía Hernández", "MAT104"),  # Cálculo 2
+        
+        ("Dr. Jorge Pérez", "MAT203"),  # Algebra y geometría analítica
+        ("Dr. Jorge Pérez", "MAT301"),  # Pensamiento cuantitativo
+
+        ("MSc. Patricia López", "MAT301")  # Pensamiento cuantitativo
+        ("MSc. Patricia López", "MAT202"),  # Matemática discreta
+
+        ("Dr. Ricardo Sánchez", "MAT101"),  # Cálculo 1
+        ("Dr. Ricardo Sánchez", "MAT102"),  # Álgebra Lineal
+        
+        ("Dra. Elena Ramírez", "MAT103"),  # Estadística
+        ("Dra. Elena Ramírez", "MAT201"),  # Ecuaciones Diferenciales
+        
+        ("Prof. Javier Torres", "MAT202"),  # Matemática discreta
+        ("Prof. Javier Torres", "MAT203"),  # Algebra y geometría analítica
+        
+        ("Dra. Carmen Castro", "MAT301")   # Pensamiento cuantitativo
+        ("Dra. Carmen Castro", "MAT104"),  # Cálculo 2
+        
+        ("Dr. Fernando Díaz", "MAT101"),  # Cálculo 1
+        ("Dr. Fernando Díaz", "MAT102"),  # Álgebra Lineal
+        
+        ("MSc. Adriana Morales", "MAT103"),  # Estadística
+        ("MSc. Adriana Morales", "MAT201")   # Ecuaciones Diferenciales
+    ]
+    
+    for profesor_nombre, curso_codigo in asignaciones_profesor_curso:
+        driver.execute_write(
+            """
+            MATCH (p:Profesor {nombre: $profesor_nombre})
+            MATCH (c:Curso {codigo: $curso_codigo})
+            MERGE (p)-[:IMPARTE]->(c)
+            """,
+            profesor_nombre=profesor_nombre,
+            curso_codigo=curso_codigo
+        )
     
     for estudiante in estudiantes:
-        estudiante.calcular_puntuacion()
+        cursos_aprobados = random.sample(cursos, random.randint(3, 5))
         
-        query = """
-        MERGE (e:Estudiante {
-            nombre: $nombre,
-            estilo_aprendizaje: $estilo_aprendizaje,
-            estilo_clase: $estilo_clase,
-            promedio: $promedio,
-            asistencias_curso_anterior: $asistencias,
-            veces_que_llevo_curso: $veces_curso,
-            puntuacion_total: $puntuacion_total
-        })
-        RETURN e
-        """
-        
-        driver = Neo4jDriver()
-        driver.execute_write(
-            query,
-            nombre=estudiante.nombre,
-            estilo_aprendizaje=estudiante.estilo_aprendizaje,
-            estilo_clase=estudiante.estilo_clase,
-            promedio=estudiante.promedio,
-            asistencias=estudiante.asistencias,
-            veces_curso=estudiante.veces_curso,
-            puntuacion_total=estudiante.puntuacion_total
-        )
-    
-    print(f"Se han creado {len(estudiantes)} estudiantes de ejemplo")
+        for curso in cursos_aprobados:
+            resultado = driver.execute_read(
+                """
+                MATCH (p)-[:IMPARTE]->(c:Curso {codigo: $codigo_curso})
+                RETURN p.nombre as profesor_nombre
+                """,
+                codigo_curso=curso.codigo
+            )
+            
+            if resultado:
+                profesor_nombre = resultado[0]["profesor_nombre"]
+                nota = random.randint(70, 95) if random.random() < 0.8 else random.randint(60, 69)
 
-def crear_profesores():
-    """Crea profesores de ejemplo en la base de datos"""
-    profesores = [
-        Profesor(nombre="Dr. Martínez", estilo_enseñanza="visual", estilo_clase="presencial", años_experiencia=10, evaluacion_docente=4.5, porcentaje_aprobados=85, disponibilidad=4),
-        Profesor(nombre="Dra. González", estilo_enseñanza="teórico", estilo_clase="virtual", años_experiencia=15, evaluacion_docente=4.8, porcentaje_aprobados=90, disponibilidad=3),
-        Profesor(nombre="Prof. Sánchez", estilo_enseñanza="práctico", estilo_clase="presencial", años_experiencia=8, evaluacion_docente=4.2, porcentaje_aprobados=78, disponibilidad=5),
-        Profesor(nombre="Dra. Ramírez", estilo_enseñanza="visual", estilo_clase="virtual", años_experiencia=12, evaluacion_docente=4.6, porcentaje_aprobados=88, disponibilidad=4),
-        Profesor(nombre="Dr. Torres", estilo_enseñanza="teórico", estilo_clase="presencial", años_experiencia=20, evaluacion_docente=4.9, porcentaje_aprobados=92, disponibilidad=2)
-    ]
-    
-    for profesor in profesores:
-        profesor.calcular_puntuacion()
-        
-        query = """
-        MERGE (p:Profesor {
-            nombre: $nombre,
-            estilo_enseñanza: $estilo_enseñanza,
-            estilo_clase: $estilo_clase,
-            años_experiencia: $años_experiencia,
-            evaluacion_docente: $evaluacion_docente,
-            porcentaje_aprobados: $porcentaje_aprobados,
-            disponibilidad: $disponibilidad,
-            puntuacion_total: $puntuacion_total
-        })
-        RETURN p
-        """
-        
-        driver = Neo4jDriver()
-        driver.execute_write(
-            query,
-            nombre=profesor.nombre,
-            estilo_enseñanza=profesor.estilo_enseñanza,
-            estilo_clase=profesor.estilo_clase,
-            años_experiencia=profesor.años_experiencia,
-            evaluacion_docente=profesor.evaluacion_docente,
-            porcentaje_aprobados=profesor.porcentaje_aprobados,
-            disponibilidad=profesor.disponibilidad,
-            puntuacion_total=profesor.puntuacion_total
-        )
-    
-    print(f"Se han creado {len(profesores)} profesores de ejemplo")
-
-def crear_relaciones():
-    """Crea relaciones entre estudiantes, profesores y cursos"""
-    driver = Neo4jDriver()
-    
-    # Relaciones entre profesores y cursos
-    relaciones_profesor_curso = [
-        ("Dr. Martínez", "MAT103"),
-        ("Dra. González", "FIS101"),
-        ("Prof. Sánchez", "INF110"),
-        ("Dra. Ramírez", "EST201"),
-        ("Dr. Torres", "INF210"),
-        ("Dr. Martínez", "EST201"),
-        ("Dra. González", "MAT103")
-    ]
-    
-    for profesor, curso in relaciones_profesor_curso:
-        driver.execute_write(
-            """
-            MATCH (p:Profesor {nombre: $nombre_profesor})
-            MATCH (c:Curso {codigo: $codigo_curso})
-            MERGE (p)-[r:IMPARTE]->(c)
-            RETURN p, r, c
-            """,
-            nombre_profesor=profesor,
-            codigo_curso=curso
-        )
-    
-    # Relaciones de aprobación entre estudiantes y cursos
-    aprobaciones = [
-        ("Juan Pérez", "MAT103", "Dr. Martínez"),
-        ("María López", "FIS101", "Dra. González"),
-        ("Carlos Rodríguez", "INF110", "Prof. Sánchez"),
-        ("Ana Martínez", "EST201", "Dra. Ramírez"),
-        ("Pedro Gómez", "INF210", "Dr. Torres"),
-        ("Juan Pérez", "EST201", "Dr. Martínez"),
-        ("María López", "MAT103", "Dra. González")
-    ]
-    
-    for estudiante, curso, profesor in aprobaciones:
-        driver.execute_write(
-            """
-            MATCH (e:Estudiante {nombre: $nombre_estudiante})
-            MATCH (p:Profesor {nombre: $nombre_profesor})
-            MATCH (c:Curso {codigo: $codigo_curso})
-            MERGE (e)-[r:APROBÓ_CON]->(c)
-            RETURN e, r, c
-            """,
-            nombre_estudiante=estudiante,
-            nombre_profesor=profesor,
-            codigo_curso=curso
-        )
-    
-    print(f"Se han creado {len(relaciones_profesor_curso)} relaciones entre profesores y cursos")
-    print(f"Se han creado {len(aprobaciones)} relaciones de aprobación")
+                driver.execute_write(
+                    """
+                    MATCH (e:Estudiante {nombre: $estudiante_nombre})
+                    MATCH (c:Curso {codigo: $curso_codigo})
+                    MERGE (e)-[:APROBÓ_CON {
+                        nota: $nota,
+                        fecha: date($fecha_aprobacion)
+                    }]->(c)
+                    """,
+                    estudiante_nombre=estudiante.nombre,
+                    curso_codigo=curso.codigo,
+                    nota=nota,
+                    fecha_aprobacion=fake.date_between(
+                        start_date=estudiante.fecha_registro, 
+                        end_date="today"
+                    ).isoformat()
+                )
+                
+                driver.execute_write(
+                    """
+                    MATCH (e:Estudiante {nombre: $estudiante_nombre})
+                    MATCH (p:Profesor {nombre: $profesor_nombre})
+                    MERGE (e)-[:RECOMENDACION]->(p)
+                    """,
+                    estudiante_nombre=estudiante.nombre,
+                    profesor_nombre=profesor_nombre
+                )
 
 def comprobar_conexion():
     """Comprueba la conexión con Neo4j"""
