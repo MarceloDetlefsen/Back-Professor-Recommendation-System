@@ -58,3 +58,7 @@ class Neo4jDriver:
                 return bool(session.run("RETURN 1").single())
         except Exception:
             return False
+            
+    def get_session(self):
+        """Devuelve una nueva sesión de la base de datos"""
+        return self.driver.session()
