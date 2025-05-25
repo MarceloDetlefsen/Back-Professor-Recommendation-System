@@ -170,6 +170,7 @@ Back-Professor-Recommendation-System/
 ### Curso
 - Nombre
 - Código
+- Departamento
 - Créditos
 
 ## Algoritmo de recomendación
