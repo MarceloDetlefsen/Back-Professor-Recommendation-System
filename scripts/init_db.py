@@ -302,12 +302,11 @@ def comprobar_conexion():
 """Se crean los estudiantes a utilizarse en el sistema de recomendación según los datos recopilados"""
 
 def crear_estudiantes(driver=None) -> list:
-    """Genera los estudiantes en el sistema"""
+    """Genera los estudiantes en el sistema sin fecha_registro"""
     carreras = ["Ingeniería en Ciencias de la Computación", "Matemática Aplicada", "Física"]
     estudiantes = []
     
-    # Crear estudiantes de prueba
-    for i in range(1, 73):  # 72 estudiantes
+    for i in range(1, 73):
         estudiantes.append({
             "nombre": f"Estudiante {i}",
             "carnet": f"24{str(i).zfill(3)}",
@@ -316,14 +315,13 @@ def crear_estudiantes(driver=None) -> list:
             "email": f"estudiante{i}@uvg.edu.gt",
             "password": f"pass{i*123}",
             "estilo_aprendizaje": random.choice(["mixto", "practico", "teorico"]),
-            "estilo_clase": random.choice(["Uso de herramientas tecnológicas", "Sin uso de herramientas tecnológicas", "Mixto"]),
+            "estilo_clase": random.choice(["con_tecnologia", "sin_tecnologia", "mixto"]),
             "promedio": random.randint(65, 95),
             "grado": f"{random.choice(['Primer', 'Segundo', 'Tercer'])} año",
             "carga_maxima": random.randint(4, 6),
             "cursos_zona_minima": random.randint(0, 2),
             "asistencias": random.randint(0, 5),
-            "veces_curso": random.randint(0, 4),
-            "fecha_registro": datetime.now().strftime("%Y-%m-%d")
+            "veces_curso": random.randint(0, 4)
         })
     
     close_driver = False
@@ -355,14 +353,12 @@ def crear_estudiantes(driver=None) -> list:
                         cursos_zona_minima: $cursos_zona_minima,
                         asistencias: $asistencias,
                         veces_curso: $veces_curso,
-                        puntuacion_total: $puntuacion_total,
-                        fecha_registro: date($fecha_registro)
+                        puntuacion_total: $puntuacion_total
                     })
                     RETURN e
                     """,
                     **estudiante.dict(exclude={"puntuacion_total"}),
-                    puntuacion_total=puntuacion,
-                    fecha_registro=e_data["fecha_registro"]
+                    puntuacion_total=puntuacion
                 )
                 
                 if result:
@@ -379,7 +375,7 @@ def crear_estudiantes(driver=None) -> list:
             driver.close()
 
 def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudiantes: list):
-    
+    #Relaciones profesor imparte curso
     asignaciones_profesor_curso = [
         ("Dr. Carlos Martínez", "MAT101"),  # Cálculo 1
         ("Dr. Carlos Martínez", "MAT104"),  # Cálculo 2
@@ -434,64 +430,61 @@ def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudi
         except Exception as e:
             print(f"Error al crear relación IMPARTE {profesor_nombre} -> {curso_codigo}: {str(e)}")
     
-    # 2. Crear relaciones ESTUDIANTE-APROBÓ_CON-CURSO
+    #Relaciones estudiante aprobó con
+    print("\nCreando relaciones ESTUDIANTE-APROBÓ_CON-CURSO...")
     print("\nCreando relaciones ESTUDIANTE-APROBÓ_CON-CURSO...")
     for estudiante in estudiantes:
-        try:
-            cursos_aprobados = random.sample(cursos, random.randint(3, 5))
-            
-            for curso in cursos_aprobados:
-                # Verificar qué profesor imparte el curso
-                profesor_result = driver.execute_read(
-                    """
-                    MATCH (p:Profesor)-[:IMPARTE]->(c:Curso {codigo: $codigo_curso})
-                    RETURN p.nombre as profesor_nombre LIMIT 1
-                    """,
-                    codigo_curso=curso.codigo
-                )
+            try:
+                cursos_aprobados = random.sample(cursos, random.randint(3, 5))
                 
-                if profesor_result:
-                    profesor_nombre = profesor_result[0]["profesor_nombre"]
-                    nota = random.randint(70, 95) if random.random() < 0.8 else random.randint(60, 69)
-                    
-                    # Crear relación APROBÓ_CON
-                    driver.execute_write(
+                for curso in cursos_aprobados:
+                    # Obtener profesor que imparte el curso
+                    profesor_result = driver.execute_read(
                         """
-                        MATCH (e:Estudiante {nombre: $estudiante_nombre})
-                        MATCH (c:Curso {codigo: $curso_codigo})
-                        MERGE (e)-[r:APROBÓ_CON {
-                            nota: $nota,
-                            fecha: date($fecha_aprobacion)
-                        }]->(c)
-                        RETURN r
+                        MATCH (p:Profesor)-[:IMPARTE]->(c:Curso {codigo: $codigo_curso})
+                        RETURN p.nombre as profesor_nombre LIMIT 1
                         """,
-                        estudiante_nombre=estudiante.nombre,
-                        curso_codigo=curso.codigo,
-                        nota=nota,
-                        fecha_aprobacion=fake.date_between(
-                            start_date=estudiante.fecha_registro, 
-                            end_date="today"
-                        ).isoformat()
+                        codigo_curso=curso.codigo
                     )
                     
-                    # Crear relación RECOMENDACION
-                    driver.execute_write(
-                        """
-                        MATCH (e:Estudiante {nombre: $estudiante_nombre})
-                        MATCH (p:Profesor {nombre: $profesor_nombre})
-                        MERGE (e)-[r:RECOMENDACION]->(p)
-                        RETURN r
-                        """,
-                        estudiante_nombre=estudiante.nombre,
-                        profesor_nombre=profesor_nombre
-                    )
-                    print(f"Relaciones creadas para {estudiante.nombre} con curso {curso.codigo}")
-                else:
-                    print(f"Advertencia: No se encontró profesor para el curso {curso.codigo}")
-        except Exception as e:
-            print(f"Error al procesar estudiante {estudiante.nombre}: {str(e)}")
-   
-
+                    if profesor_result:
+                        profesor_nombre = profesor_result[0]["profesor_nombre"]
+                        nota = random.randint(70, 95) if random.random() < 0.8 else random.randint(60, 69)
+                        
+                        # Crear relación APROBÓ_CON sin fecha
+                        driver.execute_write(
+                            """
+                            MATCH (e:Estudiante {carnet: $carnet})
+                            MATCH (c:Curso {codigo: $codigo_curso})
+                            MERGE (e)-[r:APROBÓ_CON {
+                                nota: $nota
+                            }]->(c)
+                            RETURN r
+                            """,
+                            carnet=estudiante.carnet,
+                            codigo_curso=curso.codigo,
+                            nota=nota
+                        )
+                        
+                        #Relacion de recomendacion
+                        driver.execute_write(
+                            """
+                            MATCH (e:Estudiante {carnet: $carnet})
+                            MATCH (p:Profesor {nombre: $profesor_nombre})
+                            MERGE (e)-[r:RECOMENDACION]->(p)
+                            RETURN r
+                            """,
+                            carnet=estudiante.carnet,
+                            profesor_nombre=profesor_nombre
+                        )
+                        print(f"Relaciones creadas para {estudiante.carnet} con curso {curso.codigo}")
+                    else:
+                        print(f"⚠️ No se encontró profesor para el curso {curso.codigo}")
+            except Exception as e:
+                print(f"🔥 Error al procesar estudiante {getattr(estudiante, 'carnet', '')}: {str(e)}")
+            except Exception as e:
+                print(f"🔥 Error crítico al crear relaciones: {str(e)}")    
+    
 def comprobar_conexion():
     """Comprueba la conexión con Neo4j"""
     try:
