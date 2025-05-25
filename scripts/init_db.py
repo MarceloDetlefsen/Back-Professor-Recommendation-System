@@ -26,7 +26,6 @@ def crear_restricciones():
     """Crea las restricciones de unicidad en la base de datos"""
     driver = Neo4jDriver()
     
-    # Verificar si las restricciones ya existen
     constraints = driver.execute_read("SHOW CONSTRAINTS")
     
     if not any("estudiante_nombre" in str(c).lower() for c in constraints):
@@ -42,7 +41,7 @@ def crear_restricciones():
 
 """Se crean los cursos a utilizarse en el sistema de recomendación según los datos recopilados"""
 def crear_cursos() -> list:
-    return [
+    cursos_data=[
         Curso(
             nombre="Cálculo 1",
             codigo="MAT101",
@@ -92,200 +91,292 @@ def crear_cursos() -> list:
             creditos=5
         )
     ]
-
-"""Se crean los estudiantes a utilizarse en el sistema de recomendación según los datos recopilados"""
-def crear_estudiantes() -> list:
-    carreras = [
-        "Ingeniería en Ciencias de la Computación y Tecnologías de la Información", "Ingeniería Mecatrónica", 
-        "Matemática Aplicada", "Física", "Bioquímica y microbiología",
-    ]
+    driver = Neo4jDriver()
+    cursos_creados = []
     
-    carnet = 24000
-    cantidad_estudiantes = 70
-    estudiantes = []
-    #Estudiante login
-    estudiantes.append(Estudiante(
-        nombre="estudiante_login",
-        carnet="00000",
-        carrera=random.choice(carreras),
-        email="estudiante@uvg.edu.gt",
-        password="password123",
-        pensum=2023,
-        estilo_aprendizaje="mixto",
-        estilo_clase="Mixto",
-        promedio=1,
-        grado="Primer año",
-        carga_maxima=1,
-        cursos_zona_minima=1,
-        asistencias=1,
-        veces_curso=1,
-        puntuacion_total=1,
-        fecha_registro=datetime.now().date(),
-    ))
+    for curso in cursos_data:
+        try:
+            result = driver.execute_write(
+                """
+                CREATE (c:Curso {
+                    nombre: $nombre,
+                    codigo: $codigo,
+                    departamento: $departamento,
+                    creditos: $creditos
+                })
+                RETURN c.nombre AS nombre, c.codigo AS codigo
+                """,
+                nombre=curso.nombre,
+                codigo=curso.codigo,
+                departamento=curso.departamento,
+                creditos=curso.creditos
+            )
+            
+            if result:
+                cursos_creados.append(curso)
+                print(f"✅ Curso creado: {curso.codigo}")
+            else:
+                print(f"❌ Falló al crear curso: {curso.codigo}")
+        except Exception as e:
+            print(f"🔥 Error crítico al crear curso {curso.codigo}: {str(e)}")
+        finally:
+            driver.close()
     
-    #Admin
-    estudiantes.append(Estudiante(
-        nombre="admin_login",
-        carnet="00001",
-        carrera="Administración del Sistema",
-        email="admin@uvg.edu.gt",
-        password="admin123",
-        pensum=2023,
-        estilo_aprendizaje="mixto",
-        estilo_clase="Mixto",
-        promedio=1,
-        grado="Primer año",
-        carga_maxima=1,
-        cursos_zona_minima=1,
-        asistencias=1,
-        veces_curso=1,
-        puntuacion_total=1,
-        fecha_registro=datetime.now().date(),
-    ))
-    for i in range(1, cantidad_estudiantes + 1):
-        estudiantes.append(Estudiante(
-            nombre=f"Estudiante {i}",
-            pensum=2023,
-            carnet=f"{carnet + i}",
-            carrera=random.choice(carreras),
-            email=f"estudiante{i}@universidad.edu",
-            password=f"pass{i*123}",
-            estilo_aprendizaje=random.choice(["mixto", "practico", "teorico"]),
-            estilo_clase=random.choice(["Uso de herramientas tecnológicas", "Sin uso de herramientas tecnológicas", "Mixto"]),
-            promedio=random.randint(65, 95),
-            grado=f"{random.choice(['Primer', 'Segundo', 'Tercer'])} año",
-            carga_maxima=random.randint(4, 6),
-            cursos_zona_minima=random.randint(0, 2),
-            asistencias=random.randint(0, 5),
-            veces_curso=random.randint(0, 4),
-            puntuacion_total=random.randint(0, 100),
-            fecha_registro=fake.date_between(start_date="-2y", end_date="today"),
-        ))
-    return estudiantes
+    return cursos_creados
 
 """Genera los profesores a utilizarse en el sistema de recomendación según los datos recopilados"""
 def crear_profesores() -> list:
-    profesores = [
+    profesores_data = [
         {
             "nombre": "Dr. Carlos Martínez",
-            "estilo": "teórico",
-            "clase": "presencial",
-            "exp": 15,
-            "eval": 4.8,
-            "aprob": 85,
-            "disp": 4
+            "estilo_enseñanza": "teórico",
+            "estilo_clase": "presencial",
+            "años_experiencia": 15,
+            "evaluacion_docente": 4.8,
+            "porcentaje_aprobados": 85,
+            "disponibilidad": 4
         },
         {
             "nombre": "Dra. Ana Rodríguez",
-            "estilo": "visual",
-            "clase": "virtual",
-            "exp": 10,
-            "eval": 4.5,
-            "aprob": 80,
-            "disp": 3
+            "estilo_enseñanza": "visual",
+            "estilo_clase": "virtual",
+            "años_experiencia": 10,
+            "evaluacion_docente": 4.5,
+            "porcentaje_aprobados": 80,
+            "disponibilidad": 3
         },
         {
             "nombre": "Prof. Luis García",
-            "estilo": "práctico",
-            "clase": "presencial",
-            "exp": 8,
-            "eval": 4.2,
-            "aprob": 75,
-            "disp": 5
+            "estilo_enseñanza": "práctico",
+            "estilo_clase": "presencial",
+            "años_experiencia": 8,
+            "evaluacion_docente": 4.2,
+            "porcentaje_aprobados": 75,
+            "disponibilidad": 5
         },
         {
             "nombre": "Dra. Sofía Hernández",
-            "estilo": "teórico",
-            "clase": "virtual",
-            "exp": 20,
-            "eval": 4.9,
-            "aprob": 90,
-            "disp": 3
+            "estilo_enseñanza": "teórico",
+            "estilo_clase": "virtual",
+            "años_experiencia": 20,
+            "evaluacion_docente": 4.9,
+            "porcentaje_aprobados": 90,
+            "disponibilidad": 3
         },
         {
             "nombre": "Dr. Jorge Pérez",
-            "estilo": "visual",
-            "clase": "presencial",
-            "exp": 12,
-            "eval": 4.6,
-            "aprob": 82,
-            "disp": 4
+            "estilo_enseñanza": "visual",
+            "estilo_clase": "presencial",
+            "años_experiencia": 12,
+            "evaluacion_docente": 4.6,
+            "porcentaje_aprobados": 82,
+            "disponibilidad": 4
         },
         {
             "nombre": "MSc. Patricia López",
-            "estilo": "práctico",
-            "clase": "virtual",
-            "exp": 6,
-            "eval": 4.0,
-            "aprob": 78,
-            "disp": 5
+            "estilo_enseñanza": "práctico",
+            "estilo_clase": "virtual",
+            "años_experiencia": 6,
+            "evaluacion_docente": 4.0,
+            "porcentaje_aprobados": 78,
+            "disponibilidad": 5
         },
         {
             "nombre": "Dr. Ricardo Sánchez",
-            "estilo": "teórico",
-            "clase": "presencial",
-            "exp": 18,
-            "eval": 4.7,
-            "aprob": 88,
-            "disp": 2
+            "estilo_enseñanza": "teórico",
+            "estilo_clase": "presencial",
+            "años_experiencia": 18,
+            "evaluacion_docente": 4.7,
+            "porcentaje_aprobados": 88,
+            "disponibilidad": 2
         },
         {
             "nombre": "Dra. Elena Ramírez",
-            "estilo": "visual",
-            "clase": "virtual",
-            "exp": 9,
-            "eval": 4.3,
-            "aprob": 79,
-            "disp": 4
+            "estilo_enseñanza": "visual",
+            "estilo_clase": "virtual",
+            "años_experiencia": 9,
+            "evaluacion_docente": 4.3,
+            "porcentaje_aprobados": 79,
+            "disponibilidad": 4
         },
         {
             "nombre": "Prof. Javier Torres",
-            "estilo": "práctico",
-            "clase": "presencial",
-            "exp": 7,
-            "eval": 4.1,
-            "aprob": 76,
-            "disp": 5
+            "estilo_enseñanza": "práctico",
+            "estilo_clase": "presencial",
+            "años_experiencia": 7,
+            "evaluacion_docente": 4.1,
+            "porcentaje_aprobados": 76,
+            "disponibilidad": 5
         },
         {
             "nombre": "Dra. Carmen Castro",
-            "estilo": "teórico",
-            "clase": "virtual",
-            "exp": 14,
-            "eval": 4.7,
-            "aprob": 86,
-            "disp": 3
+            "estilo_enseñanza": "teórico",
+            "estilo_clase": "virtual",
+            "años_experiencia": 14,
+            "evaluacion_docente": 4.7,
+            "porcentaje_aprobados": 86,
+            "disponibilidad": 3
         },
         {
             "nombre": "Dr. Fernando Díaz",
-            "estilo": "visual",
-            "clase": "presencial",
-            "exp": 11,
-            "eval": 4.4,
-            "aprob": 81,
-            "disp": 4
+            "estilo_enseñanza": "visual",
+            "estilo_clase": "presencial",
+            "años_experiencia": 11,
+            "evaluacion_docente": 4.4,
+            "porcentaje_aprobados": 81,
+            "disponibilidad": 4
         },
         {
             "nombre": "MSc. Adriana Morales",
-            "estilo": "práctico",
-            "clase": "virtual",
-            "exp": 5,
-            "eval": 3.9,
-            "aprob": 74,
-            "disp": 5
+            "estilo_enseñanza": "práctico",
+            "estilo_clase": "virtual",
+            "años_experiencia": 5,
+            "evaluacion_docente": 3.9,
+            "porcentaje_aprobados": 74,
+            "disponibilidad": 5
         }
     ]
+    driver = Neo4jDriver()
+    profesores_creados = 0
     
-    return [Profesor(
-        nombre=p["nombre"],
-        estilo_enseñanza=p["estilo"],
-        estilo_clase=p["clase"],
-        años_experiencia=p["exp"],
-        evaluacion_docente=p["eval"],
-        porcentaje_aprobados=p["aprob"],
-        disponibilidad=p["disp"]
-    ) for p in profesores]
+    try:
+        profesores_creados = []
+        for profesor_data in profesores_data:
+            try:
+                profesor = Profesor(**profesor_data)
+                
+                puntuacion = profesor.calcular_puntuacion()
+                
+                result = driver.execute_write(
+                    """
+                    CREATE (p:Profesor {
+                        nombre: $nombre,
+                        estilo_enseñanza: $estilo_enseñanza,
+                        estilo_clase: $estilo_clase,
+                        años_experiencia: $años_experiencia,
+                        evaluacion_docente: $evaluacion_docente,
+                        porcentaje_aprobados: $porcentaje_aprobados,
+                        disponibilidad: $disponibilidad,
+                        puntuacion_total: $puntuacion_total
+                    })
+                    RETURN p.nombre AS nombre
+                    """,
+                    nombre=profesor.nombre,
+                    estilo_enseñanza=profesor.estilo_enseñanza,
+                    estilo_clase=profesor.estilo_clase,
+                    años_experiencia=profesor.años_experiencia,
+                    evaluacion_docente=profesor.evaluacion_docente,
+                    porcentaje_aprobados=profesor.porcentaje_aprobados,
+                    disponibilidad=profesor.disponibilidad,
+                    puntuacion_total=puntuacion
+                )
+                
+                if result:
+                    profesores_creados.append(profesor)
+                    print(f"✅ Profesor creado: {profesor.nombre}")
+                else:
+                    print(f"❌ Falló al crear profesor: {profesor.nombre}")
+            except Exception as e:
+                print(f"🔥 Error al crear profesor {profesor_data.get('nombre', '')}: {str(e)}")
+        
+        return profesores_creados
+    finally:
+        driver.close()
 
+def comprobar_conexion():
+    try:
+        driver = Neo4jDriver()
+        # Prueba de escritura
+        result = driver.execute_write("CREATE (t:Test) RETURN t")
+        driver.execute_write("MATCH (t:Test) DELETE t")
+        if result:
+            print("Conexión a Neo4j con permisos de escritura exitosa! ✅")
+            return True
+        else:
+            print("Error: No se pudo escribir en Neo4j")
+            return False
+    except Exception as e:
+        print(f"Error de conexión a Neo4j: {e}")
+        return False
+    
+"""Se crean los estudiantes a utilizarse en el sistema de recomendación según los datos recopilados"""
+
+def crear_estudiantes(driver=None) -> list:
+    """Genera los estudiantes en el sistema"""
+    carreras = ["Ingeniería en Ciencias de la Computación", "Matemática Aplicada", "Física"]
+    estudiantes = []
+    
+    # Crear estudiantes de prueba
+    for i in range(1, 73):  # 72 estudiantes
+        estudiantes.append({
+            "nombre": f"Estudiante {i}",
+            "carnet": f"24{str(i).zfill(3)}",
+            "carrera": random.choice(carreras),
+            "pensum": 2023,
+            "email": f"estudiante{i}@uvg.edu.gt",
+            "password": f"pass{i*123}",
+            "estilo_aprendizaje": random.choice(["mixto", "practico", "teorico"]),
+            "estilo_clase": random.choice(["Uso de herramientas tecnológicas", "Sin uso de herramientas tecnológicas", "Mixto"]),
+            "promedio": random.randint(65, 95),
+            "grado": f"{random.choice(['Primer', 'Segundo', 'Tercer'])} año",
+            "carga_maxima": random.randint(4, 6),
+            "cursos_zona_minima": random.randint(0, 2),
+            "asistencias": random.randint(0, 5),
+            "veces_curso": random.randint(0, 4),
+            "fecha_registro": datetime.now().strftime("%Y-%m-%d")
+        })
+    
+    close_driver = False
+    if driver is None:
+        driver = Neo4jDriver()
+        close_driver = True
+    
+    try:
+        estudiantes_creados = []
+        for e_data in estudiantes:
+            try:
+                estudiante = Estudiante(**e_data)
+                puntuacion = estudiante.calcular_puntuacion()
+                
+                result = driver.execute_write(
+                    """
+                    CREATE (e:Estudiante {
+                        nombre: $nombre,
+                        carnet: $carnet,
+                        carrera: $carrera,
+                        pensum: $pensum,
+                        email: $email,
+                        password: $password,
+                        estilo_aprendizaje: $estilo_aprendizaje,
+                        estilo_clase: $estilo_clase,
+                        promedio: $promedio,
+                        grado: $grado,
+                        carga_maxima: $carga_maxima,
+                        cursos_zona_minima: $cursos_zona_minima,
+                        asistencias: $asistencias,
+                        veces_curso: $veces_curso,
+                        puntuacion_total: $puntuacion_total,
+                        fecha_registro: date($fecha_registro)
+                    })
+                    RETURN e
+                    """,
+                    **estudiante.dict(exclude={"puntuacion_total"}),
+                    puntuacion_total=puntuacion,
+                    fecha_registro=e_data["fecha_registro"]
+                )
+                
+                if result:
+                    estudiantes_creados.append(estudiante)
+                    print(f"✅ Estudiante creado: {estudiante.carnet}")
+                else:
+                    print(f"❌ Falló al crear estudiante: {estudiante.carnet}")
+            except Exception as e:
+                print(f"🔥 Error al crear estudiante {e_data.get('carnet', '')}: {str(e)}")
+        
+        return estudiantes_creados
+    finally:
+        if close_driver:
+            driver.close()
 
 def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudiantes: list):
     
@@ -326,61 +417,80 @@ def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudi
         ("MSc. Adriana Morales", "MAT103"),  # Estadística
         ("MSc. Adriana Morales", "MAT201")   # Ecuaciones Diferenciales
     ]
-    
+    print("\nCreando relaciones PROFESOR-IMPARTE-CURSO...")
     for profesor_nombre, curso_codigo in asignaciones_profesor_curso:
-        driver.execute_write(
-            """
-            MATCH (p:Profesor {nombre: $profesor_nombre})
-            MATCH (c:Curso {codigo: $curso_codigo})
-            MERGE (p)-[:IMPARTE]->(c)
-            """,
-            profesor_nombre=profesor_nombre,
-            curso_codigo=curso_codigo
-        )
-    
-    for estudiante in estudiantes:
-        cursos_aprobados = random.sample(cursos, random.randint(3, 5))
-        
-        for curso in cursos_aprobados:
-            resultado = driver.execute_read(
+        try:
+            result = driver.execute_write(
                 """
-                MATCH (p)-[:IMPARTE]->(c:Curso {codigo: $codigo_curso})
-                RETURN p.nombre as profesor_nombre
+                MATCH (p:Profesor {nombre: $profesor_nombre})
+                MATCH (c:Curso {codigo: $curso_codigo})
+                MERGE (p)-[r:IMPARTE]->(c)
+                RETURN r
                 """,
-                codigo_curso=curso.codigo
+                profesor_nombre=profesor_nombre,
+                curso_codigo=curso_codigo
             )
+            print(f"Relación IMPARTE creada: {profesor_nombre} -> {curso_codigo}: {'Éxito' if result else 'Falló'}")
+        except Exception as e:
+            print(f"Error al crear relación IMPARTE {profesor_nombre} -> {curso_codigo}: {str(e)}")
+    
+    # 2. Crear relaciones ESTUDIANTE-APROBÓ_CON-CURSO
+    print("\nCreando relaciones ESTUDIANTE-APROBÓ_CON-CURSO...")
+    for estudiante in estudiantes:
+        try:
+            cursos_aprobados = random.sample(cursos, random.randint(3, 5))
             
-            if resultado:
-                profesor_nombre = resultado[0]["profesor_nombre"]
-                nota = random.randint(70, 95) if random.random() < 0.8 else random.randint(60, 69)
-
-                driver.execute_write(
+            for curso in cursos_aprobados:
+                # Verificar qué profesor imparte el curso
+                profesor_result = driver.execute_read(
                     """
-                    MATCH (e:Estudiante {nombre: $estudiante_nombre})
-                    MATCH (c:Curso {codigo: $curso_codigo})
-                    MERGE (e)-[:APROBÓ_CON {
-                        nota: $nota,
-                        fecha: date($fecha_aprobacion)
-                    }]->(c)
+                    MATCH (p:Profesor)-[:IMPARTE]->(c:Curso {codigo: $codigo_curso})
+                    RETURN p.nombre as profesor_nombre LIMIT 1
                     """,
-                    estudiante_nombre=estudiante.nombre,
-                    curso_codigo=curso.codigo,
-                    nota=nota,
-                    fecha_aprobacion=fake.date_between(
-                        start_date=estudiante.fecha_registro, 
-                        end_date="today"
-                    ).isoformat()
+                    codigo_curso=curso.codigo
                 )
                 
-                driver.execute_write(
-                    """
-                    MATCH (e:Estudiante {nombre: $estudiante_nombre})
-                    MATCH (p:Profesor {nombre: $profesor_nombre})
-                    MERGE (e)-[:RECOMENDACION]->(p)
-                    """,
-                    estudiante_nombre=estudiante.nombre,
-                    profesor_nombre=profesor_nombre
-                )
+                if profesor_result:
+                    profesor_nombre = profesor_result[0]["profesor_nombre"]
+                    nota = random.randint(70, 95) if random.random() < 0.8 else random.randint(60, 69)
+                    
+                    # Crear relación APROBÓ_CON
+                    driver.execute_write(
+                        """
+                        MATCH (e:Estudiante {nombre: $estudiante_nombre})
+                        MATCH (c:Curso {codigo: $curso_codigo})
+                        MERGE (e)-[r:APROBÓ_CON {
+                            nota: $nota,
+                            fecha: date($fecha_aprobacion)
+                        }]->(c)
+                        RETURN r
+                        """,
+                        estudiante_nombre=estudiante.nombre,
+                        curso_codigo=curso.codigo,
+                        nota=nota,
+                        fecha_aprobacion=fake.date_between(
+                            start_date=estudiante.fecha_registro, 
+                            end_date="today"
+                        ).isoformat()
+                    )
+                    
+                    # Crear relación RECOMENDACION
+                    driver.execute_write(
+                        """
+                        MATCH (e:Estudiante {nombre: $estudiante_nombre})
+                        MATCH (p:Profesor {nombre: $profesor_nombre})
+                        MERGE (e)-[r:RECOMENDACION]->(p)
+                        RETURN r
+                        """,
+                        estudiante_nombre=estudiante.nombre,
+                        profesor_nombre=profesor_nombre
+                    )
+                    print(f"Relaciones creadas para {estudiante.nombre} con curso {curso.codigo}")
+                else:
+                    print(f"Advertencia: No se encontró profesor para el curso {curso.codigo}")
+        except Exception as e:
+            print(f"Error al procesar estudiante {estudiante.nombre}: {str(e)}")
+   
 
 def comprobar_conexion():
     """Comprueba la conexión con Neo4j"""
@@ -397,63 +507,75 @@ def comprobar_conexion():
         print(f"Error de conexión a Neo4j: {e}")
         return False
 
-def verificar_insercion(driver: Neo4jDriver):
+def verificar_insercion(driver):
     """Verificación detallada de datos insertados"""
     print("\n🔍 Verificando datos insertados...")
     
-    # 1. Verificar conteo de nodos
-    result = driver.execute_read("""
-        MATCH (n)
-        RETURN 
-            count(n) AS total_nodos,
-            sum(CASE WHEN 'Estudiante' IN labels(n) THEN 1 ELSE 0 END) AS estudiantes,
-            sum(CASE WHEN 'Profesor' IN labels(n) THEN 1 ELSE 0 END) AS profesores,
-            sum(CASE WHEN 'Curso' IN labels(n) THEN 1 ELSE 0 END) AS cursos
-    """)
-    
-    if result:
-        data = result[0]
-        print(f"Total nodos: {data['total_nodos']}")
-        print(f"- Estudiantes: {data['estudiantes']}")
-        print(f"- Profesores: {data['profesores']}")
-        print(f"- Cursos: {data['cursos']}")
-    
-    # 2. Verificar propiedades de los nodos
-    print("\n📋 Propiedades de los nodos Estudiante:")
-    props = driver.execute_read("""
-        MATCH (e:Estudiante)
-        WITH e LIMIT 1
-        RETURN keys(e) AS propiedades
-    """)
-    print("Propiedades encontradas:", props[0]["propiedades"] if props else "Ningún estudiante encontrado")
+    try:
+        result = driver.execute_read("""
+            MATCH (n)
+            RETURN 
+                count(n) AS total_nodos,
+                sum(CASE WHEN 'Estudiante' IN labels(n) THEN 1 ELSE 0 END) AS estudiantes,
+                sum(CASE WHEN 'Profesor' IN labels(n) THEN 1 ELSE 0 END) AS profesores,
+                sum(CASE WHEN 'Curso' IN labels(n) THEN 1 ELSE 0 END) AS cursos
+        """)
+        
+        if result:
+            data = result[0]
+            print(f"Total nodos: {data['total_nodos']}")
+            print(f"- Estudiantes: {data['estudiantes']}")
+            print(f"- Profesores: {data['profesores']}")
+            print(f"- Cursos: {data['cursos']}")
+            
+            if data['profesores'] == 0 or data['estudiantes'] == 0:
+                print("\n⚠️ Advertencia: No se encontraron profesores o estudiantes")
+                print("Posibles causas:")
+                print("1. Validación fallida de los datos")
+                print("2. Restricciones de la base de datos")
+                print("3. Errores silenciosos en las transacciones")
+                
+                # Verificar nodos específicos
+                print("\nMuestra de nodos creados:")
+                sample = driver.execute_read("MATCH (n) RETURN labels(n) as tipo, n LIMIT 5")
+                for item in sample:
+                    print(f"Tipo: {item['tipo']}, Datos: {dict(item['n'])}")
+    except Exception as e:
+        print(f"Error durante verificación: {str(e)}")
+
 def main():
-    """Función principal para inicializar la base de datos"""
     print("Iniciando proceso de inicialización de base de datos...")
     
-    # Comprobar conexión
     if not comprobar_conexion():
-        print("🛑 No se puede continuar sin conexión a Neo4j. Revisa la configuración en .env")
         sys.exit(1)
     
-    # Verificar si el usuario quiere limpiar la base de datos
-    respuesta = input("¿Deseas limpiar la base de datos antes de inicializarla? (s/n): ")
-    if respuesta.lower() == 's':
+    if input("¿Deseas limpiar la base de datos? (s/n): ").lower() == 's':
         limpiar_base_datos()
     
     crear_restricciones()
     
-    # Inicializar datos
-    cursos = crear_cursos()
-    estudiantes = crear_estudiantes()
-    profesores = crear_profesores()
     driver = Neo4jDriver()
-    crear_relaciones(driver, cursos, profesores, estudiantes)
-    verificar_insercion(driver)
     
-    print("\nBase de datos inicializada correctamente! 🎉")
-    print("\nPuedes ejecutar el API con el comando:")
-    print("python src/main.py")
-    print("\nLa documentación estará disponible en http://localhost:8000/docs")
-
+    try:
+        print("\n=== Creando Cursos ===")
+        cursos = crear_cursos()
+        
+        print("\n=== Creando Profesores ===")
+        profesores = crear_profesores()
+        
+        print("\n=== Creando Estudiantes ===")
+        estudiantes = crear_estudiantes()
+        
+        print("\n=== Creando Relaciones ===")
+        crear_relaciones(driver, cursos, profesores, estudiantes)
+        
+        print("\n=== Verificación Final ===")
+        verificar_insercion(driver)
+        
+        print("\n✅ Base de datos inicializada correctamente!")
+    except Exception as e:
+        print(f"🔥 Error crítico durante inicialización: {str(e)}")
+    finally:
+        driver.close()
 if __name__ == "__main__":
     main()
