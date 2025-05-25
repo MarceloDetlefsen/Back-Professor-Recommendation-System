@@ -388,11 +388,11 @@ async def asignar_curso_a_profesor(nombre_profesor: str, codigo_curso: str):
             if result_relacion.single():
                 raise HTTPException(status_code=400, detail=f"El profesor {nombre_profesor} ya imparte el curso {codigo_curso}")
             
-            # Crear la relación
+            # Crear la relación sin fecha_asignacion
             query_crear_relacion = """
             MATCH (p:Profesor {nombre: $nombre_profesor})
             MATCH (c:Curso {codigo: $codigo_curso})
-            CREATE (p)-[r:IMPARTE {fecha_asignacion: datetime()}]->(c)
+            CREATE (p)-[r:IMPARTE]->(c)
             RETURN r
             """
             
@@ -493,10 +493,10 @@ async def obtener_cursos_profesor(nombre_profesor: str):
             if not result_profesor.single():
                 raise HTTPException(status_code=404, detail=f"No se encontró al profesor {nombre_profesor}")
             
-            # Obtener cursos del profesor
+            # Obtener cursos del profesor (sin fecha_asignacion)
             query_cursos = """
-            MATCH (p:Profesor {nombre: $nombre_profesor})-[r:IMPARTE]->(c:Curso)
-            RETURN c, r.fecha_asignacion as fecha_asignacion
+            MATCH (p:Profesor {nombre: $nombre_profesor})-[:IMPARTE]->(c:Curso)
+            RETURN c
             ORDER BY c.nombre
             """
             
@@ -505,7 +505,6 @@ async def obtener_cursos_profesor(nombre_profesor: str):
             
             for record in result:
                 curso_data = dict(record["c"])
-                curso_data["fecha_asignacion"] = record["fecha_asignacion"]
                 cursos.append(curso_data)
             
             return {

@@ -316,10 +316,10 @@ async def obtener_profesores_curso(codigo: str):
             if not result_curso.single():
                 raise HTTPException(status_code=404, detail=f"No se encontró el curso {codigo}")
             
-            # Obtener profesores del curso
+            # Obtener profesores del curso (sin fecha_asignacion)
             query_profesores = """
-            MATCH (p:Profesor)-[r:IMPARTE]->(c:Curso {codigo: $codigo})
-            RETURN p, r.fecha_asignacion as fecha_asignacion
+            MATCH (p:Profesor)-[:IMPARTE]->(c:Curso {codigo: $codigo})
+            RETURN p
             ORDER BY p.nombre
             """
             
@@ -328,7 +328,6 @@ async def obtener_profesores_curso(codigo: str):
             
             for record in result:
                 profesor_data = dict(record["p"])
-                profesor_data["fecha_asignacion"] = record["fecha_asignacion"]
                 profesores.append(profesor_data)
             
             return {
