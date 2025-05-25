@@ -322,7 +322,8 @@ def crear_estudiantes(driver=None) -> list:
             "carga_maxima": random.randint(4, 6),
             "cursos_zona_minima": random.randint(0, 2),
             "asistencias": random.randint(0, 5),
-            "veces_curso": random.randint(0, 4)
+            "veces_curso": random.randint(0, 4),
+            "role": "estudiante"
         })
 
     estudiantes.extend([
@@ -340,7 +341,8 @@ def crear_estudiantes(driver=None) -> list:
             "carga_maxima": 5,
             "cursos_zona_minima": 1,
             "asistencias": 3,
-            "veces_curso": 3
+            "veces_curso": 3,
+            "role": "estudiante"
         },
         {
             "nombre": "adminlogin",
@@ -356,7 +358,8 @@ def crear_estudiantes(driver=None) -> list:
             "carga_maxima": 5,
             "cursos_zona_minima": 2,
             "asistencias": 2,
-            "veces_curso": 3
+            "veces_curso": 3,
+            "role": "admin"
         }
     ])
     
@@ -389,7 +392,8 @@ def crear_estudiantes(driver=None) -> list:
                         cursos_zona_minima: $cursos_zona_minima,
                         asistencias: $asistencias,
                         veces_curso: $veces_curso,
-                        puntuacion_total: $puntuacion_total
+                        puntuacion_total: $puntuacion_total,
+                        role: $role
                     })
                     RETURN e
                     """,

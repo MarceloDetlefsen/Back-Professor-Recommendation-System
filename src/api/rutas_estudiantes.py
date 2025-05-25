@@ -63,6 +63,7 @@ async def crear_estudiante(estudiante: Estudiante):
                 asistencias: $asistencias,
                 veces_curso: $veces_curso,
                 puntuacion_total: $puntuacion_total,
+                role: $role,
                 fecha_registro: datetime()
             })
             RETURN e

@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field, validator
-from typing import Optional
-
+from typing import Optional, Literal
 class Estudiante(BaseModel):
     """Modelo de datos para un estudiante"""
     nombre: str
@@ -20,6 +19,7 @@ class Estudiante(BaseModel):
     asistencias: Optional[int] = Field(default=5, ge=0, le=5)
     veces_curso: Optional[int] = Field(default=1, ge=0, le=5)
     puntuacion_total: Optional[int] = None
+    role: Literal["estudiante", "admin"] = "estudiante"
 
     @validator('estilo_aprendizaje')
     def validate_estilo_aprendizaje(cls, v):
