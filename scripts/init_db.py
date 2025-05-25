@@ -345,7 +345,7 @@ def crear_estudiantes(driver=None) -> list:
             "role": "estudiante"
         },
         {
-            "nombre": "adminlogin",
+            "nombre": "ADMINISTRADOR UVG",
             "carnet": "77777",
             "carrera": "Administración del Sistema",
             "pensum": 2023,
