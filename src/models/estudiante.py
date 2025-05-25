@@ -23,41 +23,23 @@ class Estudiante(BaseModel):
 
     @validator('estilo_aprendizaje')
     def validate_estilo_aprendizaje(cls, v):
-        # Mapeo de valores del frontend a valores internos
-        mapeo_estilos = {
-            "Mixto": "mixto",
-            "Práctico": "pracitco", 
-            "Teórico": "teorico"
-        }
-        
-        if v in mapeo_estilos:
-            return mapeo_estilos[v]
-        
-        # Si viene en minúsculas, aceptarlo directamente
+        # Estilos válidos directamente
         estilos_validos = ["mixto", "practico", "teorico"]
+        
         if v.lower() in estilos_validos:
             return v.lower()
             
-        raise ValueError(f"Estilo de aprendizaje debe ser uno de: {list(mapeo_estilos.keys())}")
+        raise ValueError(f"Estilo de aprendizaje debe ser uno de: {estilos_validos}")
 
     @validator('estilo_clase')
     def validate_estilo_clase(cls, v):
-        # Mapeo de valores del frontend a valores internos
-        mapeo_clase = {
-            "Uso de herramientas tecnológicas": "con_tecnologia",
-            "Sin uso de herramientas tecnológicas": "sin_tecnologia",
-            "Mixto": "mixto"
-        }
+        # Estilos válidos directamente
+        estilos_validos = ["con_tecnologia", "sin_tecnologia", "mixto"]
         
-        if v in mapeo_clase:
-            return mapeo_clase[v]
-        
-        # Si viene en minúsculas, aceptarlo directamente    
-        estilos_validos = ["tecnologico", "no_tecnologico", "mixto"]
         if v.lower() in estilos_validos:
             return v.lower()
             
-        raise ValueError(f"Estilo de clase debe ser uno de: {list(mapeo_clase.keys())}")
+        raise ValueError(f"Estilo de clase debe ser uno de: {estilos_validos}")
 
     @validator('grado')
     def validate_grado(cls, v):
