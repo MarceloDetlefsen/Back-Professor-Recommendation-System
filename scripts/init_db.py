@@ -103,6 +103,45 @@ def crear_estudiantes() -> list:
     carnet = 24000
     cantidad_estudiantes = 70
     estudiantes = []
+    #Estudiante login
+    estudiantes.append(Estudiante(
+        nombre="estudiante_login",
+        carnet="00000",
+        carrera=random.choice(carreras),
+        email="estudiante@uvg.edu.gt",
+        password="password123",
+        pensum=2023,
+        estilo_aprendizaje="mixto",
+        estilo_clase="Mixto",
+        promedio=1,
+        grado="Primer año",
+        carga_maxima=1,
+        cursos_zona_minima=1,
+        asistencias=1,
+        veces_curso=1,
+        puntuacion_total=1,
+        fecha_registro=datetime.now().date(),
+    ))
+    
+    #Admin
+    estudiantes.append(Estudiante(
+        nombre="admin_login",
+        carnet="00001",
+        carrera="Administración del Sistema",
+        email="admin@uvg.edu.gt",
+        password="admin123",
+        pensum=2023,
+        estilo_aprendizaje="mixto",
+        estilo_clase="Mixto",
+        promedio=1,
+        grado="Primer año",
+        carga_maxima=1,
+        cursos_zona_minima=1,
+        asistencias=1,
+        veces_curso=1,
+        puntuacion_total=1,
+        fecha_registro=datetime.now().date(),
+    ))
     for i in range(1, cantidad_estudiantes + 1):
         estudiantes.append(Estudiante(
             nombre=f"Estudiante {i}",
@@ -358,6 +397,35 @@ def comprobar_conexion():
         print(f"Error de conexión a Neo4j: {e}")
         return False
 
+def verificar_insercion(driver: Neo4jDriver):
+    """Verificación detallada de datos insertados"""
+    print("\n🔍 Verificando datos insertados...")
+    
+    # 1. Verificar conteo de nodos
+    result = driver.execute_read("""
+        MATCH (n)
+        RETURN 
+            count(n) AS total_nodos,
+            sum(CASE WHEN 'Estudiante' IN labels(n) THEN 1 ELSE 0 END) AS estudiantes,
+            sum(CASE WHEN 'Profesor' IN labels(n) THEN 1 ELSE 0 END) AS profesores,
+            sum(CASE WHEN 'Curso' IN labels(n) THEN 1 ELSE 0 END) AS cursos
+    """)
+    
+    if result:
+        data = result[0]
+        print(f"Total nodos: {data['total_nodos']}")
+        print(f"- Estudiantes: {data['estudiantes']}")
+        print(f"- Profesores: {data['profesores']}")
+        print(f"- Cursos: {data['cursos']}")
+    
+    # 2. Verificar propiedades de los nodos
+    print("\n📋 Propiedades de los nodos Estudiante:")
+    props = driver.execute_read("""
+        MATCH (e:Estudiante)
+        WITH e LIMIT 1
+        RETURN keys(e) AS propiedades
+    """)
+    print("Propiedades encontradas:", props[0]["propiedades"] if props else "Ningún estudiante encontrado")
 def main():
     """Función principal para inicializar la base de datos"""
     print("Iniciando proceso de inicialización de base de datos...")
@@ -380,6 +448,7 @@ def main():
     profesores = crear_profesores()
     driver = Neo4jDriver()
     crear_relaciones(driver, cursos, profesores, estudiantes)
+    verificar_insercion(driver)
     
     print("\nBase de datos inicializada correctamente! 🎉")
     print("\nPuedes ejecutar el API con el comando:")
