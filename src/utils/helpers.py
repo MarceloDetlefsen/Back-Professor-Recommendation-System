@@ -30,7 +30,7 @@ def validate_learning_style(style):
     Returns:
         bool: True si es válido, False si no
     """
-    valid_styles = ["visual", "práctico", "teórico"]
+    valid_styles = ["practico", "teorico", "mixto"]
     normalized_style = normalize_string(style)
     
     return normalized_style in [normalize_string(s) for s in valid_styles]
@@ -45,7 +45,7 @@ def validate_class_style(style):
     Returns:
         bool: True si es válido, False si no
     """
-    valid_styles = ["presencial", "virtual"]
+    valid_styles = ["con_tecnologia", "sin_tecnologia", "mixto"]
     normalized_style = normalize_string(style)
     
     return normalized_style in [normalize_string(s) for s in valid_styles]

@@ -7,15 +7,15 @@ class Curso(BaseModel):
     departamento: str
     creditos: int = Field(..., ge=0)
     
-    class Config:
-        schema_extra = {
-            "example": {
-                "nombre": "Cálculo 1",
-                "codigo": "MAT103",
-                "departamento": "Matemáticas",
-                "creditos": 4
-            }
+class Config:
+    schema_extra = {
+        "example": {
+            "nombre": "Cálculo 1",
+            "codigo": "MAT103",
+            "departamento": "Matemáticas",
+            "creditos": 4
         }
+    }
 
 class CursoEstudiante(BaseModel):
     """Modelo para relación entre estudiante y curso"""
