@@ -59,3 +59,5 @@ async def root():
 # Código para ejecutar la aplicación directamente
 if __name__ == "__main__":
     uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=DEBUG)
+
+print("Hola mundo")
