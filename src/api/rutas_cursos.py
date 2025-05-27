@@ -1,11 +1,18 @@
 from fastapi import APIRouter, HTTPException, Body
 from typing import List, Optional
+from pydantic import BaseModel
 
 from models.curso import Curso
 from database.neo4jdriver import Neo4jDriver
 from utils.helpers import create_response
 
 router = APIRouter()
+
+# Modelo para actualizaciones parciales
+class CursoUpdate(BaseModel):
+    nombre: Optional[str] = None
+    departamento: Optional[str] = None
+    creditos: Optional[int] = None
 
 @router.post("/", status_code=201)
 async def crear_curso(curso: Curso):
@@ -156,14 +163,14 @@ async def obtener_curso(codigo: str):
 @router.put("/{codigo}")
 async def actualizar_curso(
     codigo: str,
-    datos_actualizados: dict = Body(...)
+    datos_actualizados: CursoUpdate = Body(...)  # Usar el modelo de actualización parcial
 ):
     """
     Actualiza los datos de un curso existente
     
     Args:
         codigo: Código del curso a actualizar
-        datos_actualizados: Datos a actualizar
+        datos_actualizados: Datos a actualizar (solo campos proporcionados)
         
     Returns:
         Datos del curso actualizado
@@ -183,16 +190,11 @@ async def actualizar_curso(
             if not curso_existente:
                 raise HTTPException(status_code=404, detail=f"No se encontró el curso con código {codigo}")
             
-            # Construir la consulta para actualizar sólo los campos proporcionados
-            update_fields = []
-            params = {"codigo": codigo}
+            # Convertir a diccionario y filtrar campos None
+            update_data = datos_actualizados.dict(exclude_none=True)
             
-            for key, value in datos_actualizados.items():
-                if key not in ["codigo"]:  # No permitir cambiar el código (clave primaria)
-                    update_fields.append(f"c.{key} = ${key}")
-                    params[key] = value
-            
-            if not update_fields:
+            # Construir la consulta para actualizar solo los campos proporcionados
+            if not update_data:
                 curso_data = dict(curso_existente["c"])
                 return {
                     "success": True,
@@ -200,12 +202,22 @@ async def actualizar_curso(
                     "data": curso_data
                 }
             
+            update_fields = []
+            params = {"codigo": codigo}
+            
+            for key, value in update_data.items():
+                update_fields.append(f"c.{key} = ${key}")
+                params[key] = value
+            
             # Ejecutar la actualización
             query_update = f"""
             MATCH (c:Curso {{codigo: $codigo}})
             SET {', '.join(update_fields)}
             RETURN c
             """
+            
+            print(f"Query de actualización: {query_update}")  # Debug
+            print(f"Parámetros: {params}")  # Debug
             
             result_update = session.run(query_update, **params)
             updated_record = result_update.single()
@@ -227,6 +239,7 @@ async def actualizar_curso(
     except HTTPException:
         raise
     except Exception as e:
+        print(f"Error en actualizar_curso: {str(e)}")  # Debug
         raise HTTPException(status_code=500, detail=f"Error al actualizar curso: {str(e)}")
 
 @router.delete("/{codigo}")
