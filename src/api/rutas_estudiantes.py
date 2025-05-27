@@ -342,7 +342,16 @@ async def eliminar_estudiante(carnet: str):
             if not result.single():
                 raise HTTPException(status_code=404, detail=f"No se encontró al estudiante con carnet {carnet}")
             
-            # Eliminar el estudiante
+            # PRIMERO: Eliminar todas las relaciones del estudiante
+            query_eliminar_relaciones = """
+            MATCH (e:Estudiante {carnet: $carnet})-[r]-()
+            DELETE r
+            RETURN COUNT(r) as relaciones_eliminadas
+            """
+            result_relaciones = session.run(query_eliminar_relaciones, carnet=carnet)
+            relaciones_eliminadas = result_relaciones.single()["relaciones_eliminadas"]
+            
+            # LUEGO: Eliminar el estudiante
             query_delete = """
             MATCH (e:Estudiante {carnet: $carnet})
             DELETE e
@@ -356,7 +365,8 @@ async def eliminar_estudiante(carnet: str):
             
             return {
                 "success": True,
-                "message": f"Estudiante con carnet {carnet} eliminado exitosamente"
+                "message": f"Estudiante con carnet {carnet} eliminado exitosamente (se eliminaron {relaciones_eliminadas} relaciones)",
+                "relaciones_eliminadas": relaciones_eliminadas
             }
         finally:
             session.close()
