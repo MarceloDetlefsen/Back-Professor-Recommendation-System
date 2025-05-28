@@ -10,6 +10,7 @@ router = APIRouter()
 @router.get("/recomendaciones/{nombre_estudiante}")
 async def obtener_recomendaciones(
     nombre_estudiante: str,
+    curso: Optional[str] = Query(None, description="Código del curso para filtrar recomendaciones"),
     limite: Optional[int] = Query(None, description="Número máximo de recomendaciones a devolver")
 ):
     """
@@ -24,18 +25,17 @@ async def obtener_recomendaciones(
     """
     try:
         algoritmo = AlgoritmoRecomendacion()
-        recomendaciones = algoritmo.recomendar_profesores(nombre_estudiante)
+        recomendaciones = algoritmo.recomendar_profesores(nombre_estudiante, codigo_curso=curso)
         
         if isinstance(recomendaciones, dict) and "error" in recomendaciones:
             raise HTTPException(status_code=404, detail=recomendaciones["error"])
             
-        # Aplicar límite si se especifica
         if limite is not None and limite > 0:
             recomendaciones = recomendaciones[:limite]
             
         return create_response(
             data=recomendaciones,
-            message=f"Se encontraron {len(recomendaciones)} recomendaciones para {nombre_estudiante}"
+            message=f"Se encontraron {len(recomendaciones)} recomendaciones para {nombre_estudiante}" + (f" en el curso {curso}" if curso else "")
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener recomendaciones: {str(e)}")
