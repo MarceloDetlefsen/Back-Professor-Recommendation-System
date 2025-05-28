@@ -126,127 +126,186 @@ def crear_cursos() -> list:
 
 """Genera los profesores a utilizarse en el sistema de recomendación según los datos recopilados"""
 def crear_profesores() -> list:
-    profesores_data = [
-        {
-            "nombre": "Dr. Carlos Martínez",
-            "estilo_enseñanza": "mixto",
-            "estilo_clase": "con_tecnologia",
-            "años_experiencia": 15,
-            "evaluacion_docente": 4.8,
-            "porcentaje_aprobados": 85,
-            "disponibilidad": 4
-        },
-        {
-            "nombre": "Dra. Ana Rodríguez",
-            "estilo_enseñanza": "practico",
-            "estilo_clase": "mixto",
-            "años_experiencia": 10,
-            "evaluacion_docente": 4.5,
-            "porcentaje_aprobados": 80,
-            "disponibilidad": 3
-        },
-        {
-            "nombre": "Prof. Luis García",
-            "estilo_enseñanza": "teorico",
-            "estilo_clase": "sin_tecnologia",
-            "años_experiencia": 8,
-            "evaluacion_docente": 4.2,
-            "porcentaje_aprobados": 75,
-            "disponibilidad": 5
-        },
-        {
-            "nombre": "Dra. Sofía Hernández",
-            "estilo_enseñanza": "mixto",
-            "estilo_clase": "con_tecnologia",
-            "años_experiencia": 20,
-            "evaluacion_docente": 4.9,
-            "porcentaje_aprobados": 90,
-            "disponibilidad": 3
-        },
-        {
-            "nombre": "Dr. Jorge Pérez",
-            "estilo_enseñanza": "practico",
-            "estilo_clase": "mixto",
-            "años_experiencia": 12,
-            "evaluacion_docente": 4.6,
-            "porcentaje_aprobados": 82,
-            "disponibilidad": 4
-        },
-        {
-            "nombre": "MSc. Patricia López",
-            "estilo_enseñanza": "teorico",
-            "estilo_clase": "sin_tecnologia",
-            "años_experiencia": 6,
-            "evaluacion_docente": 4.0,
-            "porcentaje_aprobados": 78,
-            "disponibilidad": 5
-        },
-        {
-            "nombre": "Dr. Ricardo Sánchez",
-            "estilo_enseñanza": "mixto",
-            "estilo_clase": "con_tecnologia",
-            "años_experiencia": 18,
-            "evaluacion_docente": 4.7,
-            "porcentaje_aprobados": 88,
-            "disponibilidad": 2
-        },
-        {
-            "nombre": "Dra. Elena Ramírez",
-            "estilo_enseñanza": "practico",
-            "estilo_clase": "mixto",
-            "años_experiencia": 9,
-            "evaluacion_docente": 4.3,
-            "porcentaje_aprobados": 79,
-            "disponibilidad": 4
-        },
-        {
-            "nombre": "Prof. Javier Torres",
-            "estilo_enseñanza": "teorico",
-            "estilo_clase": "sin_tecnologia",
-            "años_experiencia": 7,
-            "evaluacion_docente": 4.1,
-            "porcentaje_aprobados": 76,
-            "disponibilidad": 5
-        },
-        {
-            "nombre": "Dra. Carmen Castro",
-            "estilo_enseñanza": "mixto",
-            "estilo_clase": "con_tecnologia",
-            "años_experiencia": 14,
-            "evaluacion_docente": 4.7,
-            "porcentaje_aprobados": 86,
-            "disponibilidad": 3
-        },
-        {
-            "nombre": "Dr. Fernando Díaz",
-            "estilo_enseñanza": "practico",
-            "estilo_clase": "mixto",
-            "años_experiencia": 11,
-            "evaluacion_docente": 4.4,
-            "porcentaje_aprobados": 81,
-            "disponibilidad": 4
-        },
-        {
-            "nombre": "MSc. Adriana Morales",
-            "estilo_enseñanza": "teorico",
-            "estilo_clase": "sin_tecnologia",
-            "años_experiencia": 5,
-            "evaluacion_docente": 3.9,
-            "porcentaje_aprobados": 74,
-            "disponibilidad": 5
-        }
-    ]
+    # profesores_data = [
+    #     {
+    #         "nombre": "Dr. Carlos Martínez",
+    #         "estilo_enseñanza": "mixto",
+    #         "estilo_clase": "con_tecnologia",
+    #         "años_experiencia": 15,
+    #         "evaluacion_docente": 4.8,
+    #         "porcentaje_aprobados": 85,
+    #         "disponibilidad": 4
+    #     },
+    #     {
+    #         "nombre": "Dra. Ana Rodríguez",
+    #         "estilo_enseñanza": "practico",
+    #         "estilo_clase": "mixto",
+    #         "años_experiencia": 10,
+    #         "evaluacion_docente": 4.5,
+    #         "porcentaje_aprobados": 80,
+    #         "disponibilidad": 3
+    #     },
+    #     {
+    #         "nombre": "Prof. Luis García",
+    #         "estilo_enseñanza": "teorico",
+    #         "estilo_clase": "sin_tecnologia",
+    #         "años_experiencia": 8,
+    #         "evaluacion_docente": 4.2,
+    #         "porcentaje_aprobados": 75,
+    #         "disponibilidad": 5
+    #     },
+    #     {
+    #         "nombre": "Dra. Sofía Hernández",
+    #         "estilo_enseñanza": "mixto",
+    #         "estilo_clase": "con_tecnologia",
+    #         "años_experiencia": 20,
+    #         "evaluacion_docente": 4.9,
+    #         "porcentaje_aprobados": 90,
+    #         "disponibilidad": 3
+    #     },
+    #     {
+    #         "nombre": "Dr. Jorge Pérez",
+    #         "estilo_enseñanza": "practico",
+    #         "estilo_clase": "mixto",
+    #         "años_experiencia": 12,
+    #         "evaluacion_docente": 4.6,
+    #         "porcentaje_aprobados": 82,
+    #         "disponibilidad": 4
+    #     },
+    #     {
+    #         "nombre": "MSc. Patricia López",
+    #         "estilo_enseñanza": "teorico",
+    #         "estilo_clase": "sin_tecnologia",
+    #         "años_experiencia": 6,
+    #         "evaluacion_docente": 4.0,
+    #         "porcentaje_aprobados": 78,
+    #         "disponibilidad": 5
+    #     },
+    #     {
+    #         "nombre": "Dr. Ricardo Sánchez",
+    #         "estilo_enseñanza": "mixto",
+    #         "estilo_clase": "con_tecnologia",
+    #         "años_experiencia": 18,
+    #         "evaluacion_docente": 4.7,
+    #         "porcentaje_aprobados": 88,
+    #         "disponibilidad": 2
+    #     },
+    #     {
+    #         "nombre": "Dra. Elena Ramírez",
+    #         "estilo_enseñanza": "practico",
+    #         "estilo_clase": "mixto",
+    #         "años_experiencia": 9,
+    #         "evaluacion_docente": 4.3,
+    #         "porcentaje_aprobados": 79,
+    #         "disponibilidad": 4
+    #     },
+    #     {
+    #         "nombre": "Prof. Javier Torres",
+    #         "estilo_enseñanza": "teorico",
+    #         "estilo_clase": "sin_tecnologia",
+    #         "años_experiencia": 7,
+    #         "evaluacion_docente": 4.1,
+    #         "porcentaje_aprobados": 76,
+    #         "disponibilidad": 5
+    #     },
+    #     {
+    #         "nombre": "Dra. Carmen Castro",
+    #         "estilo_enseñanza": "mixto",
+    #         "estilo_clase": "con_tecnologia",
+    #         "años_experiencia": 14,
+    #         "evaluacion_docente": 4.7,
+    #         "porcentaje_aprobados": 86,
+    #         "disponibilidad": 3
+    #     },
+    #     {
+    #         "nombre": "Dr. Fernando Díaz",
+    #         "estilo_enseñanza": "practico",
+    #         "estilo_clase": "mixto",
+    #         "años_experiencia": 11,
+    #         "evaluacion_docente": 4.4,
+    #         "porcentaje_aprobados": 81,
+    #         "disponibilidad": 4
+    #     },
+    #     {
+    #         "nombre": "MSc. Adriana Morales",
+    #         "estilo_enseñanza": "teorico",
+    #         "estilo_clase": "sin_tecnologia",
+    #         "años_experiencia": 5,
+    #         "evaluacion_docente": 3.9,
+    #         "porcentaje_aprobados": 74,
+    #         "disponibilidad": 5
+    #     }
+    # ]
+    # driver = Neo4jDriver()
+    # profesores_creados = 0
+    
+    # try:
+    #     profesores_creados = []
+    #     for profesor_data in profesores_data:
+    #         try:
+    #             profesor = Profesor(**profesor_data)
+                
+    #             puntuacion = profesor.calcular_puntuacion()
+                
+    #             result = driver.execute_write(
+    #                 """
+    #                 CREATE (p:Profesor {
+    #                     nombre: $nombre,
+    #                     estilo_enseñanza: $estilo_enseñanza,
+    #                     estilo_clase: $estilo_clase,
+    #                     años_experiencia: $años_experiencia,
+    #                     evaluacion_docente: $evaluacion_docente,
+    #                     porcentaje_aprobados: $porcentaje_aprobados,
+    #                     disponibilidad: $disponibilidad,
+    #                     puntuacion_total: $puntuacion_total
+    #                 })
+    #                 RETURN p.nombre AS nombre
+    #                 """,
+    #                 nombre=profesor.nombre,
+    #                 estilo_enseñanza=profesor.estilo_enseñanza,
+    #                 estilo_clase=profesor.estilo_clase,
+    #                 años_experiencia=profesor.años_experiencia,
+    #                 evaluacion_docente=profesor.evaluacion_docente,
+    #                 porcentaje_aprobados=profesor.porcentaje_aprobados,
+    #                 disponibilidad=profesor.disponibilidad,
+    #                 puntuacion_total=puntuacion
+    #             )
+                
+    #             if result:
+    #                 profesores_creados.append(profesor)
+    #                 print(f"✅ Profesor creado: {profesor.nombre}")
+    #             else:
+    #                 print(f"❌ Falló al crear profesor: {profesor.nombre}")
+    #         except Exception as e:
+    #             print(f"🔥 Error al crear profesor {profesor_data.get('nombre', '')}: {str(e)}")
+        
+    #     return profesores_creados
+    # finally:
+    #     driver.close()
+
+    fake = Faker('es_ES')
     driver = Neo4jDriver()
-    profesores_creados = 0
+    profesores_creados = []
     
     try:
-        profesores_creados = []
-        for profesor_data in profesores_data:
+        #Genera 12 (cambiar cuando necesiten)
+        for _ in range(12):
             try:
-                profesor = Profesor(**profesor_data)
+                profesor_data = {
+                    "nombre": f"{random.choice(['Dr.', 'Dra.', 'Prof.', 'MSc.'])} {fake.first_name()} {fake.last_name()}",
+                    "estilo_enseñanza": random.choice(["mixto", "practico", "teorico"]),
+                    "estilo_clase": random.choice(["con_tecnologia", "sin_tecnologia", "mixto"]),
+                    "años_experiencia": random.randint(1, 30),
+                    "evaluacion_docente": round(random.uniform(3.0, 5.0), 1),
+                    "porcentaje_aprobados": random.randint(65, 98),
+                    "disponibilidad": random.randint(1, 5)
+                }
                 
+                # Crear objeto Profesor y calcular puntuación
+                profesor = Profesor(**profesor_data)
                 puntuacion = profesor.calcular_puntuacion()
                 
+                # Insertar en Neo4j
                 result = driver.execute_write(
                     """
                     CREATE (p:Profesor {
@@ -261,28 +320,26 @@ def crear_profesores() -> list:
                     })
                     RETURN p.nombre AS nombre
                     """,
-                    nombre=profesor.nombre,
-                    estilo_enseñanza=profesor.estilo_enseñanza,
-                    estilo_clase=profesor.estilo_clase,
-                    años_experiencia=profesor.años_experiencia,
-                    evaluacion_docente=profesor.evaluacion_docente,
-                    porcentaje_aprobados=profesor.porcentaje_aprobados,
-                    disponibilidad=profesor.disponibilidad,
+                    **profesor.dict(exclude={"puntuacion_total"}),
                     puntuacion_total=puntuacion
                 )
                 
                 if result:
                     profesores_creados.append(profesor)
                     print(f"✅ Profesor creado: {profesor.nombre}")
+                    print(f"   - Estilo: {profesor.estilo_enseñanza}/{profesor.estilo_clase}")
+                    print(f"   - Exp: {profesor.años_experiencia} años, Eval: {profesor.evaluacion_docente}")
                 else:
                     print(f"❌ Falló al crear profesor: {profesor.nombre}")
+                    
             except Exception as e:
-                print(f"🔥 Error al crear profesor {profesor_data.get('nombre', '')}: {str(e)}")
+                print(f"🔥 Error al crear profesor: {str(e)}")
         
         return profesores_creados
+        
     finally:
         driver.close()
-
+        
 def comprobar_conexion():
     try:
         driver = Neo4jDriver()
@@ -415,60 +472,85 @@ def crear_estudiantes(driver=None) -> list:
             driver.close()
 
 def crear_relaciones(driver: Neo4jDriver, cursos: list, profesores: list, estudiantes: list):
-    #Relaciones profesor imparte curso
-    asignaciones_profesor_curso = [
-        ("Dr. Carlos Martínez", "MAT101"),  # Cálculo 1
-        ("Dr. Carlos Martínez", "MAT104"),  # Cálculo 2
+    # #Relaciones profesor imparte curso
+    # asignaciones_profesor_curso = [
+    #     ("Dr. Carlos Martínez", "MAT101"),  # Cálculo 1
+    #     ("Dr. Carlos Martínez", "MAT104"),  # Cálculo 2
 
-        ("Dra. Ana Rodríguez", "MAT102"),  # Álgebra Lineal
-        ("Dra. Ana Rodríguez", "MAT202"),  # Matemática discreta
+    #     ("Dra. Ana Rodríguez", "MAT102"),  # Álgebra Lineal
+    #     ("Dra. Ana Rodríguez", "MAT202"),  # Matemática discreta
         
-        ("Prof. Luis García", "MAT103"),   # Estadística
-        ("Prof. Luis García", "MAT201"),   # Ecuaciones Diferenciales
+    #     ("Prof. Luis García", "MAT103"),   # Estadística
+    #     ("Prof. Luis García", "MAT201"),   # Ecuaciones Diferenciales
         
-        ("Dra. Sofía Hernández", "MAT201"),  # Ecuaciones Diferenciales
-        ("Dra. Sofía Hernández", "MAT104"),  # Cálculo 2
+    #     ("Dra. Sofía Hernández", "MAT201"),  # Ecuaciones Diferenciales
+    #     ("Dra. Sofía Hernández", "MAT104"),  # Cálculo 2
         
-        ("Dr. Jorge Pérez", "MAT203"),  # Algebra y geometría analítica
-        ("Dr. Jorge Pérez", "MAT301"),  # Pensamiento cuantitativo
+    #     ("Dr. Jorge Pérez", "MAT203"),  # Algebra y geometría analítica
+    #     ("Dr. Jorge Pérez", "MAT301"),  # Pensamiento cuantitativo
 
-        ("MSc. Patricia López", "MAT301"),  # Pensamiento cuantitativo
-        ("MSc. Patricia López", "MAT202"),  # Matemática discreta
+    #     ("MSc. Patricia López", "MAT301"),  # Pensamiento cuantitativo
+    #     ("MSc. Patricia López", "MAT202"),  # Matemática discreta
 
-        ("Dr. Ricardo Sánchez", "MAT101"),  # Cálculo 1
-        ("Dr. Ricardo Sánchez", "MAT102"),  # Álgebra Lineal
+    #     ("Dr. Ricardo Sánchez", "MAT101"),  # Cálculo 1
+    #     ("Dr. Ricardo Sánchez", "MAT102"),  # Álgebra Lineal
         
-        ("Dra. Elena Ramírez", "MAT103"),  # Estadística
-        ("Dra. Elena Ramírez", "MAT201"),  # Ecuaciones Diferenciales
+    #     ("Dra. Elena Ramírez", "MAT103"),  # Estadística
+    #     ("Dra. Elena Ramírez", "MAT201"),  # Ecuaciones Diferenciales
         
-        ("Prof. Javier Torres", "MAT202"),  # Matemática discreta
-        ("Prof. Javier Torres", "MAT203"),  # Algebra y geometría analítica
+    #     ("Prof. Javier Torres", "MAT202"),  # Matemática discreta
+    #     ("Prof. Javier Torres", "MAT203"),  # Algebra y geometría analítica
         
-        ("Dra. Carmen Castro", "MAT301"),   # Pensamiento cuantitativo
-        ("Dra. Carmen Castro", "MAT104"),  # Cálculo 2
+    #     ("Dra. Carmen Castro", "MAT301"),   # Pensamiento cuantitativo
+    #     ("Dra. Carmen Castro", "MAT104"),  # Cálculo 2
         
-        ("Dr. Fernando Díaz", "MAT101"),  # Cálculo 1
-        ("Dr. Fernando Díaz", "MAT102"),  # Álgebra Lineal
+    #     ("Dr. Fernando Díaz", "MAT101"),  # Cálculo 1
+    #     ("Dr. Fernando Díaz", "MAT102"),  # Álgebra Lineal
         
-        ("MSc. Adriana Morales", "MAT103"),  # Estadística
-        ("MSc. Adriana Morales", "MAT201")   # Ecuaciones Diferenciales
-    ]
+    #     ("MSc. Adriana Morales", "MAT103"),  # Estadística
+    #     ("MSc. Adriana Morales", "MAT201")   # Ecuaciones Diferenciales
+    # ]
+    # print("\nCreando relaciones PROFESOR-IMPARTE-CURSO...")
+    # for profesor_nombre, curso_codigo in asignaciones_profesor_curso:
+    #     try:
+    #         result = driver.execute_write(
+    #             """
+    #             MATCH (p:Profesor {nombre: $profesor_nombre})
+    #             MATCH (c:Curso {codigo: $curso_codigo})
+    #             MERGE (p)-[r:IMPARTE]->(c)
+    #             RETURN r
+    #             """,
+    #             profesor_nombre=profesor_nombre,
+    #             curso_codigo=curso_codigo
+    #         )
+    #         print(f"Relación IMPARTE creada: {profesor_nombre} -> {curso_codigo}: {'Éxito' if result else 'Falló'}")
+    #     except Exception as e:
+    #         print(f"Error al crear relación IMPARTE {profesor_nombre} -> {curso_codigo}: {str(e)}")
+
+        # 1. Relaciones PROFESOR-IMPARTE-CURSO (asignación aleatoria)
     print("\nCreando relaciones PROFESOR-IMPARTE-CURSO...")
-    for profesor_nombre, curso_codigo in asignaciones_profesor_curso:
+    #Se le asignan entre 2 y 3 cursos a cada profe
+    for profesor in profesores:
         try:
-            result = driver.execute_write(
-                """
-                MATCH (p:Profesor {nombre: $profesor_nombre})
-                MATCH (c:Curso {codigo: $curso_codigo})
-                MERGE (p)-[r:IMPARTE]->(c)
-                RETURN r
-                """,
-                profesor_nombre=profesor_nombre,
-                curso_codigo=curso_codigo
-            )
-            print(f"Relación IMPARTE creada: {profesor_nombre} -> {curso_codigo}: {'Éxito' if result else 'Falló'}")
+            #cursos random
+            cursos_asignados = random.sample(cursos, k=random.randint(2, 3))
+            
+            for curso in cursos_asignados:
+                result = driver.execute_write(
+                    """
+                    MATCH (p:Profesor {nombre: $profesor_nombre})
+                    MATCH (c:Curso {codigo: $curso_codigo})
+                    MERGE (p)-[r:IMPARTE]->(c)
+                    RETURN r
+                    """,
+                    profesor_nombre=profesor.nombre,
+                    curso_codigo=curso.codigo
+                )
+                print(f"✅ {profesor.nombre} imparte {curso.codigo} ({curso.nombre})")
+                
         except Exception as e:
-            print(f"Error al crear relación IMPARTE {profesor_nombre} -> {curso_codigo}: {str(e)}")
+            print(f"🔥 Error al asignar cursos a {profesor.nombre}: {str(e)}")
+
     
     #Relaciones estudiante aprobó con
     print("\nCreando relaciones ESTUDIANTE-APROBÓ_CON-CURSO...")
