@@ -2,7 +2,7 @@
 
 Este sistema utiliza un algoritmo basado en grafos para recomendar profesores a estudiantes, considerando estilos de aprendizaje, rendimiento académico y experiencias previas de estudiantes similares.
 
-## Características
+## 📊Características
 
 - API RESTful desarrollada con FastAPI
 - Base de datos de grafos en Neo4j para almacenar relaciones entre estudiantes, profesores y cursos
@@ -14,14 +14,14 @@ Este sistema utiliza un algoritmo basado en grafos para recomendar profesores a 
   - Resultados de estudiantes similares con el mismo profesor
   - Desempeño académico del estudiante
 
-## Requisitos
+## ✅Requisitos
 
 - Python 3.10+
 - Neo4j (instancia local o en la nube)
 - Poetry (para gestión de dependencias)
 - Dependencias listadas en pyproject.toml
 
-## Instalación
+## 🛠️Instalación
 
 ### 1. Instalar Poetry
 
@@ -49,7 +49,7 @@ source ~/.bashrc
 poetry --version
 ```
 
-### 2. Modificaciones
+### ⚙️2. Modificaciones
 
 1. Clonar el repositorio:
 ```bash
@@ -79,7 +79,7 @@ Editar el archivo `config.py`en el source del proyecto con la siguiente informac
   NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "tu_contraseña") //Modificar esto
   ```
 
-## Iniciar la aplicación
+## 🪄Iniciar la aplicación
 
 1. Se ponen de momento asi datos en la base datos.
 ```bash
@@ -95,14 +95,14 @@ poetry run python src/main.py // <------- A mi me funciona esta
 
 La API estará disponible en `http://localhost:8000`
 
-## Documentación de la API
+## 📄Documentación de la API
 
 Luego de iniciar la aplicación, puedes acceder a la documentación interactiva:
 
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
-## Estructura del proyecto
+## 🗂️Estructura del proyecto
 
 ```
 Back-Professor-Recommendation-System/
@@ -147,9 +147,9 @@ Back-Professor-Recommendation-System/
 ├── README.md
 ```
 
-# Modelos de datos
+# 🗃️Modelos de datos
 
-### Estudiante
+### 🧑‍🎓Estudiante
 - Nombre
 - Estilo de aprendizaje (visual, práctico, teórico)
 - Estilo de clase (presencial, virtual)
@@ -158,7 +158,7 @@ Back-Professor-Recommendation-System/
 - Cantidad de veces que ha llevado el curso
 - Puntuación total (calculada)
 
-### Profesor
+### 🧑‍🏫Profesor
 - Nombre
 - Estilo de enseñanza (visual, práctico, teórico)
 - Estilo de clase (presencial, virtual)
@@ -168,13 +168,13 @@ Back-Professor-Recommendation-System/
 - Disponibilidad
 - Puntuación total (calculada)
 
-### Curso
+### 📒Curso
 - Nombre
 - Código
 - Departamento
 - Créditos
 
-## Algoritmo de recomendación
+## 🧠🔁Algoritmo de recomendación
 
 El algoritmo toma en cuenta:
 1. La compatibilidad del estilo de aprendizaje del estudiante con el estilo de enseñanza del profesor
