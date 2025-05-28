@@ -328,18 +328,18 @@ def crear_estudiantes(driver=None) -> list:
 
     estudiantes.extend([
         {
-            "nombre": "estudiantelogin",
-            "carnet": "99999",
+            "nombre": "Usuario de Prueba",
+            "carnet": "00001",
             "carrera": random.choice(carreras),
-            "pensum": 2023,
+            "pensum": 2025,
             "email": "estudiante@uvg.edu.gt",
             "password": "password123",
             "estilo_aprendizaje": "mixto",
-            "estilo_clase": "mixto",
-            "promedio": 1,
+            "estilo_clase": "con_tecnologia",
+            "promedio": 73,
             "grado": "Segundo año",
-            "carga_maxima": 5,
-            "cursos_zona_minima": 1,
+            "carga_maxima": 6,
+            "cursos_zona_minima": 4,
             "asistencias": 3,
             "veces_curso": 3,
             "role": "estudiante"
