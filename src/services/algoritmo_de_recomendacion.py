@@ -11,7 +11,7 @@ class AlgoritmoRecomendacion:
         self.algoritmo_estudiante = AlgoritmoEstudiante()
         self.algoritmo_profesor = AlgoritmoProfesor()
     
-    def z(self, nombre_estudiante, codigo_curso=None):
+    def recomendar_profesores(self, nombre_estudiante, codigo_curso=None):
         """
         Recomienda profesores para un estudiante específico, opcionalmente para un curso específico
         
@@ -77,72 +77,127 @@ class AlgoritmoRecomendacion:
             # Agregar a la lista de recomendaciones
             recomendaciones.append({
                 "profesor": profesor["nombre"],
-                "indice_compatibilidad": indice_ajustado,
-                "factor_confianza": confianza * 100,
-                "compatibilidad_estilos": compatibilidad * 100,
-                "calidad_profesor": calidad_profesor * 100,
-                "afinidad": afinidad * 100,
+                "indice_compatibilidad": round(indice_ajustado, 2),
+                "porcentaje_recomendacion": round(indice_ajustado, 2),  # Campo para el frontend
+                "factor_confianza": round(confianza * 100, 2),
+                "compatibilidad_estilos": round(compatibilidad * 100, 2),
+                "calidad_profesor": round(calidad_profesor * 100, 2),
+                "afinidad": round(afinidad * 100, 2),
                 "departamento": profesor.get("departamento", "N/A"),
-                "evaluacion_docente": profesor.get("evaluacion_docente", 0),
-                "porcentaje_aprobados": profesor.get("porcentaje_aprobados", 0),
+                "evaluacion_docente": profesor.get("evaluacion_docente", 3.0),
+                "porcentaje_aprobados": profesor.get("porcentaje_aprobados", 60),
                 "años_experiencia": profesor.get("años_experiencia", 0),
-                "estilo_enseñanza": profesor.get("estilo_enseñanza"),
-                "estilo_clase": profesor.get("estilo_clase")
+                "estilo_enseñanza": profesor.get("estilo_enseñanza", "mixto"),
+                "estilo_clase": profesor.get("estilo_clase", "mixto"),
+                # Detalles adicionales para debugging
+                "detalles_calculo": {
+                    "compatibilidad_bruta": round(compatibilidad, 3),
+                    "afinidad_bruta": round(afinidad, 3),
+                    "confianza_bruta": round(confianza, 3),
+                    "calidad_bruta": round(calidad_profesor, 3),
+                    "rendimiento_bruta": round(rendimiento_estudiante, 3)
+                }
             })
         
         # Ordenar recomendaciones por índice de compatibilidad (de mayor a menor)
         return sorted(recomendaciones, key=lambda x: x["indice_compatibilidad"], reverse=True)
     
     def calcular_compatibilidad_estilos(self, estudiante, profesor):
-        """Calcula la compatibilidad de estilos con escala gradual"""
-        # Mapeo de compatibilidades entre estilos
+        """
+        Calcula la compatibilidad de estilos con escala gradual y valores corregidos
+        """
+        # Mapeo de compatibilidades entre estilos de aprendizaje/enseñanza
         compatibilidad_aprendizaje = {
-            'visual': {'visual': 1.0, 'auditivo': 0.7, 'kinestesico': 0.5},
-            'auditivo': {'visual': 0.7, 'auditivo': 1.0, 'kinestesico': 0.6},
-            'kinestesico': {'visual': 0.5, 'auditivo': 0.6, 'kinestesico': 1.0}
+            'mixto': {
+                'mixto': 1.0,      # Perfecto match
+                'teorico': 0.8,    # Muy buena compatibilidad  
+                'practico': 0.8    # Muy buena compatibilidad
+            },
+            'teorico': {
+                'teorico': 1.0,    # Perfecto match
+                'mixto': 0.8,      # Muy buena compatibilidad
+                'practico': 0.4    # Baja compatibilidad
+            },
+            'practico': {
+                'practico': 1.0,   # Perfecto match
+                'mixto': 0.8,      # Muy buena compatibilidad
+                'teorico': 0.4     # Baja compatibilidad
+            }
         }
         
+        # Mapeo de compatibilidades entre estilos de clase
         compatibilidad_clase = {
-            'presencial': {'presencial': 1.0, 'virtual': 0.6, 'hibrido': 0.8},
-            'virtual': {'presencial': 0.6, 'virtual': 1.0, 'hibrido': 0.9},
-            'hibrido': {'presencial': 0.8, 'virtual': 0.9, 'hibrido': 1.0}
+            'con_tecnologia': {
+                'con_tecnologia': 1.0,  # Perfecto match
+                'mixto': 0.9,           # Excelente compatibilidad
+                'sin_tecnologia': 0.3   # Baja compatibilidad
+            },
+            'sin_tecnologia': {
+                'sin_tecnologia': 1.0,  # Perfecto match
+                'mixto': 0.9,           # Excelente compatibilidad
+                'con_tecnologia': 0.3   # Baja compatibilidad
+            },
+            'mixto': {
+                'mixto': 1.0,           # Perfecto match
+                'con_tecnologia': 0.9,  # Excelente compatibilidad
+                'sin_tecnologia': 0.9   # Excelente compatibilidad
+            }
         }
         
-        # Obtener valores con defaults razonables
-        estilo_estudiante = estudiante.get("estilo_aprendizaje", "visual").lower()
-        estilo_profesor = profesor.get("estilo_enseñanza", "visual").lower()
-        clase_estudiante = estudiante.get("estilo_clase", "presencial").lower()
-        clase_profesor = profesor.get("estilo_clase", "presencial").lower()
+        # Obtener valores con defaults y normalizar a minúsculas
+        estilo_estudiante = str(estudiante.get("estilo_aprendizaje", "mixto")).lower().strip()
+        estilo_profesor = str(profesor.get("estilo_enseñanza", "mixto")).lower().strip()
+        clase_estudiante = str(estudiante.get("estilo_clase", "mixto")).lower().strip()
+        clase_profesor = str(profesor.get("estilo_clase", "mixto")).lower().strip()
+        
+        # Validar que los estilos sean válidos
+        estilos_validos_aprendizaje = ['mixto', 'teorico', 'practico']
+        estilos_validos_clase = ['con_tecnologia', 'sin_tecnologia', 'mixto']
+        
+        if estilo_estudiante not in estilos_validos_aprendizaje:
+            estilo_estudiante = 'mixto'
+        if estilo_profesor not in estilos_validos_aprendizaje:
+            estilo_profesor = 'mixto'
+        if clase_estudiante not in estilos_validos_clase:
+            clase_estudiante = 'mixto'
+        if clase_profesor not in estilos_validos_clase:
+            clase_profesor = 'mixto'
         
         # Calcular compatibilidades
-        comp_aprendizaje = compatibilidad_aprendizaje.get(estilo_estudiante, {}).get(estilo_profesor, 0.5)
-        comp_clase = compatibilidad_clase.get(clase_estudiante, {}).get(clase_profesor, 0.5)
+        comp_aprendizaje = compatibilidad_aprendizaje[estilo_estudiante][estilo_profesor]
+        comp_clase = compatibilidad_clase[clase_estudiante][clase_profesor]
         
-        return (comp_aprendizaje * 0.6 + comp_clase * 0.4)  # Ponderación 60-40
+        # Ponderación: 60% estilo de aprendizaje, 40% estilo de clase
+        compatibilidad_final = (comp_aprendizaje * 0.6 + comp_clase * 0.4)
+        
+        return compatibilidad_final
     
     def calcular_afinidad(self, nombre_estudiante, nombre_profesor):
-        """Calcula afinidad basada en estudiantes similares"""
+        """
+        Calcula afinidad basada en estudiantes similares con mejor tolerancia
+        """
         query = """
         MATCH (e:Estudiante {nombre: $nombre_estudiante})
         MATCH (similar:Estudiante)
         WHERE similar.nombre <> e.nombre
             AND similar.estilo_aprendizaje = e.estilo_aprendizaje
             AND similar.estilo_clase = e.estilo_clase
-            AND abs(similar.promedio - e.promedio) <= 15
+            AND abs(similar.promedio - e.promedio) <= 20
         OPTIONAL MATCH (similar)-[:APROBÓ_CON]->(c:Curso)<-[:IMPARTE]-(p:Profesor {nombre: $nombre_profesor})
         WITH count(DISTINCT similar) AS total_similares,
-             count(DISTINCT CASE WHEN similar IS NOT NULL THEN c ELSE NULL END) AS cursos_aprobados
+             count(DISTINCT CASE WHEN c IS NOT NULL THEN c ELSE NULL END) AS cursos_aprobados
         RETURN 
             CASE 
-                WHEN total_similares > 0 THEN cursos_aprobados/toFloat(total_similares)
+                WHEN total_similares > 0 THEN toFloat(cursos_aprobados)/toFloat(total_similares)
                 ELSE 0.5
             END AS afinidad,
             CASE
-                WHEN total_similares >= 10 THEN 1.0
-                WHEN total_similares >= 5 THEN 0.8
-                WHEN total_similares >= 3 THEN 0.6
-                WHEN total_similares > 0 THEN 0.4
-                ELSE 0.2
+                WHEN total_similares >= 15 THEN 1.0
+                WHEN total_similares >= 10 THEN 0.9
+                WHEN total_similares >= 5 THEN 0.7
+                WHEN total_similares >= 3 THEN 0.5
+                WHEN total_similares > 0 THEN 0.3
+                ELSE 0.1
             END AS confianza
         """
         
@@ -152,39 +207,77 @@ class AlgoritmoRecomendacion:
             nombre_profesor=nombre_profesor
         )
         
-        if result:
-            return result[0]["afinidad"], result[0]["confianza"]
-        return 0.5, 0.2
+        if result and len(result) > 0:
+            return float(result[0]["afinidad"]), float(result[0]["confianza"])
+        return 0.5, 0.1
     
     def calcular_calidad_profesor(self, profesor):
-        """Calcula un índice de calidad del profesor normalizado a 0-1"""
-        evaluacion = profesor.get("evaluacion_docente", 3.0) / 5.0  # Normalizar a 0-1
-        aprobados = profesor.get("porcentaje_aprobados", 60) / 100.0  # Normalizar a 0-1
-        experiencia = min(profesor.get("años_experiencia", 0), 30) / 30.0  # Normalizar a 0-1 con tope en 30 años
+        """
+        Calcula un índice de calidad del profesor normalizado a 0-1 con validaciones
+        """
+        # Obtener valores con validaciones
+        evaluacion = float(profesor.get("evaluacion_docente", 3.0))
+        aprobados = float(profesor.get("porcentaje_aprobados", 60))
+        experiencia = float(profesor.get("años_experiencia", 0))
         
-        return (evaluacion * 0.5 + aprobados * 0.3 + experiencia * 0.2)
+        # Normalizar evaluación docente (escala 1-5 a 0-1)
+        evaluacion_norm = max(0, min(1, (evaluacion - 1) / 4.0))
+        
+        # Normalizar porcentaje de aprobados (0-100 a 0-1)
+        aprobados_norm = max(0, min(1, aprobados / 100.0))
+        
+        # Normalizar experiencia (tope en 25 años)
+        experiencia_norm = max(0, min(1, experiencia / 25.0))
+        
+        # Calcular índice final con pesos ajustados
+        calidad = (evaluacion_norm * 0.5 + aprobados_norm * 0.3 + experiencia_norm * 0.2)
+        
+        return calidad
     
     def calcular_rendimiento_estudiante(self, estudiante):
-        """Calcula un índice de rendimiento del estudiante normalizado a 0-1"""
-        promedio = estudiante.get("promedio", 70) / 100.0  # Normalizar a 0-1
-        veces_curso = min(estudiante.get("veces_curso", 0), 3) / 3.0  # Normalizar a 0-1 con tope en 3 veces
+        """
+        Calcula un índice de rendimiento del estudiante normalizado a 0-1
+        """
+        # Obtener valores con validaciones
+        promedio = float(estudiante.get("promedio", 70))
+        veces_curso = int(estudiante.get("veces_que_llevo_curso", 0))
         
-        return (promedio * 0.7 + veces_curso * 0.3)
+        # Normalizar promedio (0-100 a 0-1)
+        promedio_norm = max(0, min(1, promedio / 100.0))
+        
+        # Penalización por repetir curso (menos veces es mejor)
+        # 0 veces = 1.0, 1 vez = 0.7, 2 veces = 0.4, 3+ veces = 0.1
+        if veces_curso == 0:
+            veces_norm = 1.0
+        elif veces_curso == 1:
+            veces_norm = 0.7
+        elif veces_curso == 2:
+            veces_norm = 0.4
+        else:
+            veces_norm = 0.1
+        
+        # Combinar métricas: 80% promedio, 20% historial de repetición
+        rendimiento = (promedio_norm * 0.8 + veces_norm * 0.2)
+        
+        return rendimiento
     
     def registrar_recomendacion(self, nombre_estudiante, nombre_profesor, indice):
         """Registra la recomendación en la base de datos"""
-        self.driver.execute_write(
-            """
-            MATCH (e:Estudiante {nombre: $nombre_estudiante})
-            MATCH (p:Profesor {nombre: $nombre_profesor})
-            MERGE (e)-[r:RECOMENDADO]->(p)
-            SET r.indice_compatibilidad = $indice,
-                r.fecha_recomendacion = datetime()
-            """,
-            nombre_estudiante=nombre_estudiante,
-            nombre_profesor=nombre_profesor,
-            indice=indice
-        )
+        try:
+            self.driver.execute_write(
+                """
+                MATCH (e:Estudiante {nombre: $nombre_estudiante})
+                MATCH (p:Profesor {nombre: $nombre_profesor})
+                MERGE (e)-[r:RECOMENDADO]->(p)
+                SET r.indice_compatibilidad = $indice,
+                    r.fecha_recomendacion = datetime()
+                """,
+                nombre_estudiante=nombre_estudiante,
+                nombre_profesor=nombre_profesor,
+                indice=indice
+            )
+        except Exception as e:
+            print(f"Error al registrar recomendación: {e}")
     
     def registrar_aprobacion_curso(self, nombre_estudiante, nombre_profesor, codigo_curso):
         """
@@ -198,20 +291,65 @@ class AlgoritmoRecomendacion:
         Returns:
             bool: True si se registró correctamente, False en caso contrario
         """
+        try:
+            query = """
+            MATCH (e:Estudiante {nombre: $nombre_estudiante})
+            MATCH (p:Profesor {nombre: $nombre_profesor})
+            MATCH (c:Curso {codigo: $codigo_curso})
+            MERGE (e)-[r:APROBÓ_CON]->(c)
+            SET r.fecha_aprobacion = datetime()
+            MERGE (p)-[:IMPARTE]->(c)
+            RETURN e, r, c
+            """
+            
+            result = self.driver.execute_write(
+                query,
+                nombre_estudiante=nombre_estudiante,
+                nombre_profesor=nombre_profesor,
+                codigo_curso=codigo_curso
+            )
+            
+            return len(result) > 0
+        except Exception as e:
+            print(f"Error al registrar aprobación: {e}")
+            return False
+    
+    def obtener_estadisticas_algoritmo(self, nombre_estudiante):
+        """
+        Obtiene estadísticas del algoritmo para debugging y análisis
+        
+        Args:
+            nombre_estudiante: Nombre del estudiante
+            
+        Returns:
+            dict: Estadísticas del algoritmo
+        """
         query = """
         MATCH (e:Estudiante {nombre: $nombre_estudiante})
-        MATCH (p:Profesor {nombre: $nombre_profesor})
-        MATCH (c:Curso {codigo: $codigo_curso})
-        MERGE (e)-[r:APROBÓ_CON]->(c)
-        MERGE (p)-[:IMPARTE]->(c)
-        RETURN e, r, c
+        OPTIONAL MATCH (e)-[r:RECOMENDADO]->(p:Profesor)
+        OPTIONAL MATCH (similar:Estudiante)
+        WHERE similar.nombre <> e.nombre
+            AND similar.estilo_aprendizaje = e.estilo_aprendizaje
+            AND similar.estilo_clase = e.estilo_clase
+            AND abs(similar.promedio - e.promedio) <= 20
+        RETURN 
+            e,
+            count(DISTINCT r) as total_recomendaciones,
+            count(DISTINCT similar) as estudiantes_similares,
+            avg(r.indice_compatibilidad) as promedio_compatibilidad
         """
         
-        result = self.driver.execute_write(
-            query,
-            nombre_estudiante=nombre_estudiante,
-            nombre_profesor=nombre_profesor,
-            codigo_curso=codigo_curso
-        )
+        result = self.driver.execute_read(query, nombre_estudiante=nombre_estudiante)
         
-        return len(result) > 0
+        if result and len(result) > 0:
+            record = result[0]
+            return {
+                "estudiante": record["e"],
+                "total_recomendaciones": record["total_recomendaciones"] or 0,
+                "estudiantes_similares": record["estudiantes_similares"] or 0,
+                "promedio_compatibilidad": round(float(record["promedio_compatibilidad"] or 0), 2)
+            }
+        
+        return {
+            "error": f"No se encontró información para el estudiante {nombre_estudiante}"
+        }

@@ -13,14 +13,14 @@ class Profesor(BaseModel):
 
     @validator('estilo_enseñanza')
     def validate_estilo_ensenanza(cls, v):
-        estilos_validos = ["visual", "práctico", "teórico"]
+        estilos_validos = ["mixto", "practico", "teorico"]
         if v.lower() not in estilos_validos:
             raise ValueError(f"Estilo de enseñanza debe ser uno de: {estilos_validos}")
         return v.lower()
 
     @validator('estilo_clase')
     def validate_estilo_clase(cls, v):
-        estilos_validos = ["presencial", "virtual"]
+        estilos_validos = ["con_tecnologia", "sin_tecnologia", "mixto"]
         if v.lower() not in estilos_validos:
             raise ValueError(f"Estilo de clase debe ser uno de: {estilos_validos}")
         return v.lower()
