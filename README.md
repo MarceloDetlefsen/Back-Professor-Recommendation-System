@@ -5,13 +5,14 @@ Este sistema utiliza un algoritmo basado en grafos para recomendar profesores a 
 ## Características
 
 - API RESTful desarrollada con FastAPI
-- Base de datos de grafos Neo4j para almacenar relaciones entre estudiantes, profesores y cursos
+- Base de datos de grafos en Neo4j para almacenar relaciones entre estudiantes, profesores y cursos
 - Algoritmo de recomendación que considera múltiples factores:
   - Estilo de aprendizaje del estudiante y estilo de enseñanza del profesor
   - Preferencia por clases presenciales o virtuales
   - Experiencia del profesor
   - Evaluaciones de estudiantes anteriores
   - Resultados de estudiantes similares con el mismo profesor
+  - Desempeño académico del estudiante
 
 ## Requisitos
 
@@ -154,7 +155,7 @@ Back-Professor-Recommendation-System/
 - Estilo de clase (presencial, virtual)
 - Promedio académico
 - Asistencias
-- Veces que ha llevado el curso
+- Cantidad de veces que ha llevado el curso
 - Puntuación total (calculada)
 
 ### Profesor
@@ -182,4 +183,4 @@ El algoritmo toma en cuenta:
 4. La puntuación del profesor basada en su experiencia y evaluaciones
 5. El éxito que han tenido estudiantes similares con cada profesor
 
-El resultado es un índice de compatibilidad que determina qué profesores son más recomendables para cada estudiante específico.
+El resultado es un índice de compatibilidad estudiante-profesor que determina qué profesores son más recomendables para cada estudiante específico.
