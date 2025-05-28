@@ -83,14 +83,16 @@ Editar el archivo `config.py`en el source del proyecto con la siguiente informac
 
 1. Se ponen de momento asi datos en la base datos.
 ```bash
-poetry run python -m scripts.init_db // <------- A mi me funciona esta
+///Se recomiendan los siguientes comandos:
+poetry run python -m scripts.init_db 
 poetry run python scripts/init_db.py
 ```
 
 2. Se ejecuta el programa
 ```bash
+///Se recomiendan los siguientes comandos:
 poetry run python -m src.main
-poetry run python src/main.py // <------- A mi me funciona esta
+poetry run python src/main.py
 ```
 
 La API estará disponible en `http://localhost:8000`
@@ -151,22 +153,30 @@ Back-Professor-Recommendation-System/
 
 ### 🧑‍🎓Estudiante
 - Nombre
+- Carnet
+- Carrera
+- Año de pensum
+- Email
+- Contraseña
 - Estilo de aprendizaje (visual, práctico, teórico)
 - Estilo de clase (presencial, virtual)
 - Promedio académico
-- Asistencias
-- Cantidad de veces que ha llevado el curso
-- Puntuación total (calculada)
+- Grado (año cursando)
+- Carga máxima de cursos por ciclo
+- Cursos aprobados con más de la zona mínima
+- Asistencia
+- Veces que ha llevado el curso
+- Puntuación total (calculada a partir del resto de información)
 
 ### 🧑‍🏫Profesor
 - Nombre
 - Estilo de enseñanza (visual, práctico, teórico)
 - Estilo de clase (presencial, virtual)
 - Años de experiencia
-- Evaluación docente
+- Puntuación en la evaluación docente
 - Porcentaje de estudiantes aprobados
-- Disponibilidad
-- Puntuación total (calculada)
+- Nivel de disponibilidad
+- Puntuación total (calculada a partir del resto de información)
 
 ### 📒Curso
 - Nombre
