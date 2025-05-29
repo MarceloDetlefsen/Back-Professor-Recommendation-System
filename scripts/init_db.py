@@ -145,7 +145,9 @@ def crear_cursos(driver: Neo4jDriver) -> list:
 
 """Genera los profesores a utilizarse en el sistema de recomendación según los datos recopilados
 Estos profesores se crean manualmente ya que se utilizan datos reales obtenidos
-por parte de consultas a distintos estudiantes del departamento de matemáticas"""
+por parte de consultas a distintos estudiantes del departamento de matemáticas
+Todos los nombres de los catedráticos a quienes se realizaron las consultas fueron reemplazados por nombres ficticios
+para proteger la privacidad de los mismos"""
 
 def crear_profesores(driver: Neo4jDriver) -> list:
     profesores_data = [
