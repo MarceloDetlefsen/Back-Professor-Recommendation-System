@@ -304,25 +304,10 @@ async def eliminar_profesor(nombre: str):
             if not result.single():
                 raise HTTPException(status_code=404, detail=f"No se encontró al profesor con nombre {nombre}")
             
-            # Verificar que no tiene relaciones
-            query_relaciones = """
-            MATCH (p:Profesor {nombre: $nombre})
-            MATCH (p)-[r]-()
-            RETURN count(r) as num_relaciones
-            """
-            result_relaciones = session.run(query_relaciones, nombre=nombre)
-            relaciones = result_relaciones.single()
-            
-            if relaciones and relaciones["num_relaciones"] > 0:
-                raise HTTPException(
-                    status_code=400, 
-                    detail=f"No se puede eliminar al profesor {nombre} porque tiene relaciones con cursos"
-                )
-            
-            # Eliminar el profesor
+            # Eliminar el profesor y sus relaciones automaticamente
             query_delete = """
             MATCH (p:Profesor {nombre: $nombre})
-            DELETE p
+            DETACH DELETE p
             RETURN COUNT(p) as deleted_count
             """
             result_delete = session.run(query_delete, nombre=nombre)
@@ -333,7 +318,7 @@ async def eliminar_profesor(nombre: str):
             
             return {
                 "success": True,
-                "message": f"Profesor {nombre} eliminado exitosamente"
+                "message": f"Profesor {nombre} eliminado exitosamente junto con todas sus relaciones"
             }
         finally:
             session.close()
