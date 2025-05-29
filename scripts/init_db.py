@@ -47,7 +47,7 @@ def crear_cursos(driver: Neo4jDriver) -> list:
             creditos=4
         ),
         Curso(
-            nombre="Álgebra Lineal",
+            nombre="Algebra Lineal",
             codigo="MAT102",
             departamento="Matemáticas",
             creditos=3
@@ -388,22 +388,22 @@ def crear_estudiantes(driver=None) -> list:
                 "Ingeniería civil arquitectónica", "Ingeniería química", "Ingeniería biomédica", "Bioquímica y microbiología", "Química", "Química Farmacéutica",
                 "Arquitectura", "Ingeniería electrónica"]
     estudiantes = []
-    for i in range(1, 41):
+    for i in range(1, 99):
         estudiantes.append({
             "nombre": fake.name(),
-            "carnet": f"24{str(i).zfill(3)}",
+            "carnet": f"25{str(i).zfill(3)}",
             "carrera": random.choice(carreras),
-            "pensum": 2023,
+            "pensum": 2025,
             "email": f"estudiante{i}@uvg.edu.gt",
             "password": f"pass{i*123}",
             "estilo_aprendizaje": random.choice(["mixto", "practico", "teorico"]),
             "estilo_clase": random.choice(["con_tecnologia", "sin_tecnologia", "mixto"]),
-            "promedio": random.randint(65, 95),
-            "grado": f"{random.choice(['Primer', 'Segundo', 'Tercer'])} año",
+            "promedio": random.randint(45, 95),
+            "grado": f"{random.choice(['Primer', 'Segundo', 'Tercer', 'Cuarto', 'Quinto', 'Sexto'])} año",
             "carga_maxima": random.randint(4, 6),
-            "cursos_zona_minima": random.randint(0, 2),
+            "cursos_zona_minima": random.randint(0, 3),
             "asistencias": random.randint(0, 5),
-            "veces_curso": random.randint(0, 4),
+            "veces_curso": random.randint(0, 5),
             "role": "estudiante"
         })
 
@@ -420,9 +420,9 @@ def crear_estudiantes(driver=None) -> list:
             "promedio": 73,
             "grado": "Segundo año",
             "carga_maxima": 6,
-            "cursos_zona_minima": 4,
-            "asistencias": 3,
-            "veces_curso": 3,
+            "cursos_zona_minima": 5,
+            "asistencias": 4,
+            "veces_curso": 1,
             "role": "estudiante"
         },
         {

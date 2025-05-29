@@ -17,7 +17,7 @@ class Estudiante(BaseModel):
     
     # Campos opcionales para compatibilidad con el código existente
     asistencias: Optional[int] = Field(default=5, ge=0, le=5)
-    veces_curso: Optional[int] = Field(default=1, ge=0, le=5)
+    veces_curso: Optional[int] = Field(default=0, ge=0, le=5)
     puntuacion_total: Optional[int] = None
     role: Literal["estudiante", "admin"] = "estudiante"
 

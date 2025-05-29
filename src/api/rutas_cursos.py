@@ -245,7 +245,7 @@ async def actualizar_curso(
 @router.delete("/{codigo}")
 async def eliminar_curso(codigo: str):
     """
-    Elimina un curso de la base de datos (solo si no tiene relaciones)
+    Elimina un curso de la base de datos junto con todas sus relaciones
     
     Args:
         codigo: Código del curso a eliminar
@@ -266,25 +266,11 @@ async def eliminar_curso(codigo: str):
             if not result.single():
                 raise HTTPException(status_code=404, detail=f"No se encontró el curso con código {codigo}")
             
-            # Verificar que no tiene relaciones
-            query_relaciones = """
-            MATCH (c:Curso {codigo: $codigo})
-            MATCH (c)-[r]-()
-            RETURN count(r) as num_relaciones
-            """
-            result_relaciones = session.run(query_relaciones, codigo=codigo)
-            relaciones = result_relaciones.single()
-            
-            if relaciones and relaciones["num_relaciones"] > 0:
-                raise HTTPException(
-                    status_code=400, 
-                    detail=f"No se puede eliminar el curso {codigo} porque tiene relaciones con estudiantes o profesores"
-                )
-            
-            # Eliminar el curso
+            # Eliminar el curso y todas sus relaciones automáticamente
+            # Neo4j elimina automáticamente las relaciones cuando eliminas un nodo
             query_delete = """
             MATCH (c:Curso {codigo: $codigo})
-            DELETE c
+            DETACH DELETE c
             RETURN COUNT(c) as deleted_count
             """
             result_delete = session.run(query_delete, codigo=codigo)
@@ -295,7 +281,7 @@ async def eliminar_curso(codigo: str):
             
             return {
                 "success": True,
-                "message": f"Curso {codigo} eliminado exitosamente"
+                "message": f"Curso {codigo} eliminado exitosamente junto con todas sus relaciones"
             }
         finally:
             session.close()
