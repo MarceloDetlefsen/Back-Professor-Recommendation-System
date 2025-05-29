@@ -143,7 +143,10 @@ def crear_cursos(driver: Neo4jDriver) -> list:
     
     return cursos_creados
 
-"""Genera los profesores a utilizarse en el sistema de recomendación según los datos recopilados"""
+"""Genera los profesores a utilizarse en el sistema de recomendación según los datos recopilados
+Estos profesores se crean manualmente ya que se utilizan datos reales obtenidos
+por parte de consultas a distintos estudiantes del departamento de matemáticas"""
+
 def crear_profesores(driver: Neo4jDriver) -> list:
     profesores_data = [
         {
@@ -381,7 +384,9 @@ def comprobar_conexion(driver: Neo4jDriver):
         return False
 
 
-"""Se crean los estudiantes a utilizarse en el sistema de recomendación según los datos recopilados"""
+"""Se crean los estudiantes a utilizarse en el sistema de recomendación según los datos recopilados
+Se consideró crer estudiantes de forma al azar pero con valores lógicos ya que dentro de una institución educativa existen
+estudiantes de todo tipo, de esta manear no utilizamos datos idóneos para el sistema de recomendación"""
 def crear_estudiantes(driver=None) -> list:
     """Genera los estudiantes en el sistema sin fecha_registro"""
     carreras = ["Ingeniería en Ciencias de la Computación", "Matemática Aplicada", "Física", "Ingeniería Mecánica", "Ingeniería Industrial",
