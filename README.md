@@ -84,16 +84,15 @@ Editar el archivo `config.py`en el source del proyecto con la siguiente informac
 
 1. Se ponen de momento asi datos en la base datos.
 ```bash
-///Se recomiendan los siguientes comandos:
-poetry run python -m scripts.init_db 
-poetry run python scripts/init_db.py
+poetry run python -m scripts.init_db <----- Se recomienda este comando
+poetry run python scripts/init_db.py 
 ```
 
 2. Se ejecuta el programa
 ```bash
 ///Se recomiendan los siguientes comandos:
 poetry run python -m src.main
-poetry run python src/main.py
+poetry run python src/main.py <----- Se recomienda este comando
 ```
 
 La API estará disponible en `http://localhost:8000`
