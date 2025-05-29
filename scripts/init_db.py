@@ -59,7 +59,7 @@ def crear_cursos(driver: Neo4jDriver) -> list:
             creditos=4
         ),
         Curso(
-            nombre="Estadística",
+            nombre="Estadística 1",
             codigo="MAT103",
             departamento="Matemáticas",
             creditos=3
@@ -91,6 +91,24 @@ def crear_cursos(driver: Neo4jDriver) -> list:
         Curso(
             nombre="Lógica matemática",
             codigo="MAT302",
+            departamento="Matemáticas",
+            creditos=3
+        ),
+        Curso(
+            nombre="Estadística 2",
+            codigo="MAT303",
+            departamento="Matemáticas",
+            creditos=4
+        ),
+        Curso(
+            nombre="Geometría Euclidiana",
+            codigo="MAT304",
+            departamento="Matemáticas",
+            creditos=3
+        ),
+        Curso(
+            nombre="Teoría de Números",
+            codigo="MAT305",
             departamento="Matemáticas",
             creditos=3
         )
@@ -235,6 +253,78 @@ def crear_profesores(driver: Neo4jDriver) -> list:
             "evaluacion_docente": 3.9,
             "porcentaje_aprobados": 74,
             "disponibilidad": 5
+        },
+        {
+            "nombre": "Renato Sagastume",
+            "estilo_enseñanza": "teorico",
+            "estilo_clase": "con_tecnologia",
+            "años_experiencia": 9,
+            "evaluacion_docente": 3.8,
+            "porcentaje_aprobados": 65,
+            "disponibilidad": 3
+        },
+        {
+            "nombre": "Eusebio Francesco",
+            "estilo_enseñanza": "mixto",
+            "estilo_clase": "sin_tecnologia",
+            "años_experiencia": 4,
+            "evaluacion_docente": 4.3,
+            "porcentaje_aprobados": 87,
+            "disponibilidad": 4
+        },
+        {
+            "nombre": "Alfredo Bustamante",
+            "estilo_enseñanza": "practico",
+            "estilo_clase": "con_tecnologia",
+            "años_experiencia": 4,
+            "evaluacion_docente": 3.8,
+            "porcentaje_aprobados": 86,
+            "disponibilidad": 2
+        },
+        {
+            "nombre": "Matteo Joronen",
+            "estilo_enseñanza": "mixto",
+            "estilo_clase": "sin_tecnologia",
+            "años_experiencia": 7,
+            "evaluacion_docente": 4.4,
+            "porcentaje_aprobados": 81,
+            "disponibilidad": 4
+        },
+        {
+            "nombre": "Francesco Zampano",
+            "estilo_enseñanza": "practico",
+            "estilo_clase": "sin_tecnologia",
+            "años_experiencia": 9,
+            "evaluacion_docente": 4.7,
+            "porcentaje_aprobados": 91,
+            "disponibilidad": 5
+        },
+        {
+            "nombre": "Marcos Alonso",
+            "estilo_enseñanza": "teorico",
+            "estilo_clase": "sin_tecnologia",
+            "años_experiencia": 2,
+            "evaluacion_docente": 3.6,
+            "porcentaje_aprobados": 70,
+            "disponibilidad": 2
+        },
+        {
+            "nombre": "Henry Martin",
+            "estilo_enseñanza": "mixto",
+            "estilo_clase": "con_tecnologia",
+            "años_experiencia": 13,
+            "evaluacion_docente": 4.0,
+            "porcentaje_aprobados": 92,
+            "disponibilidad": 2
+        },
+        {
+            "nombre": "Oliver Giroud",
+            "estilo_enseñanza": "teorico",
+            "estilo_clase": "sin_tecnologia",
+            "años_experiencia": 6,
+            "evaluacion_docente": 4.1,
+            "porcentaje_aprobados": 84,
+            "disponibilidad": 4
         }
     ]
     profesores_creados = []
@@ -298,7 +388,7 @@ def crear_estudiantes(driver=None) -> list:
                 "Ingeniería civil arquitectónica", "Ingeniería química", "Ingeniería biomédica", "Bioquímica y microbiología", "Química", "Química Farmacéutica",
                 "Arquitectura", "Ingeniería electrónica"]
     estudiantes = []
-    for i in range(1, 21):
+    for i in range(1, 41):
         estudiantes.append({
             "nombre": fake.name(),
             "carnet": f"24{str(i).zfill(3)}",
@@ -411,10 +501,13 @@ def crear_relaciones(driver: Neo4jDriver, cursos: List[Curso],profesores: List[P
         ("Carmen Castro", "MAT301"), ("Carmen Castro", "MAT104"),
         ("Fernando Díaz", "MAT101"), ("Fernando Díaz", "MAT102"),
         ("Adriana Morales", "MAT103"), ("Adriana Morales", "MAT201"),
-        ("Carlos Martínez", "MAT302"),
-        ("Patricia López", "MAT302"),
-        ("Javier Torres", "MAT302")
-    ]
+        ("Carlos Martínez", "MAT302"),("Patricia López", "MAT302"),
+        ("Javier Torres", "MAT302"), ("Renato Sagastume", "MAT303"),
+        ("Eusebio Francesco", "MAT304"),("Alfredo Bustamante", "MAT305"),
+        ("Matteo Joronen", "MAT303"),("Francesco Zampano", "MAT304"),
+        ("Marcos Alonso", "MAT305"),("Henry Martin", "MAT303"),
+        ("Oliver Giroud", "MAT304")
+        ]
     
     print("\nCreando relaciones PROFESOR-IMPARTE-CURSO...")
     for profesor_nombre, curso_codigo in asignaciones_profesor_curso:
